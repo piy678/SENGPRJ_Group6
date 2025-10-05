@@ -56,3 +56,18 @@ Jackson + springdoc-openapi (Swagger UI)
 UI: JavaFX oder Thymeleaf  
 Testing: JUnit 5, Spring Boot Test, Testcontainers (Postgres), REST-assured  
 Docker + docker-compose; Actuator für Health/Metrics  
+
+## Questions:
+Should the tool be web-based (browser) or desktop-based (JavaFX, Electron, etc.)? 
+
+Do we need to implement authentication or can we assume a single teacher and student?  
+
+How detailed should the LEO structure be (tree hierarchy vs. simple list)?  
+
+Should the visualization be graphical (like a dependency tree) or textual (list with status)?  
+
+Should we store the data locally or in a database (e.g. SQLite, MySQL)?  
+
+Is suggestion logic mandatory or optional (for “next possible LEOs”)?  
+
+Should grading levels (“not reached”, “partially reached”, “reached”) be customizable?  
