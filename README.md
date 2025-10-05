@@ -49,11 +49,9 @@ When a higher-level LEO is marked as Reached, all dependent (implied) lower-leve
 Java 17  
 Spring Boot (Web, Data JPA)  
 Maven oder Gradle  
-PostgreSQL + Flyway (DB & Migration)  
-Hibernate (JPA)  
-Spring Security (bcrypt; JWT)  
-Jackson + springdoc-openapi (Swagger UI)  
-UI: JavaFX oder Thymeleaf  
+PostgreSQL   
+Hibernate (JPA)    
+UI: JavaFX  
 Testing: JUnit 5, Spring Boot Test, Testcontainers (Postgres), REST-assured  
 Docker + docker-compose; Actuator für Health/Metrics  
 
