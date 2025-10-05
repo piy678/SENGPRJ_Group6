@@ -43,4 +43,16 @@ When a higher-level LEO is marked as Reached, all dependent (implied) lower-leve
  - Unit tests
  - Integration tests 
  - API tests (REST-assured) and one E2E test 
-- [ ] Performance sanity: quick local check that key endpoints respond 
+- [ ] Performance sanity: quick local check that key endpoints respond
+
+## Tools used for the Project:  
+Java 17  
+Spring Boot (Web, Data JPA)  
+Maven oder Gradle  
+PostgreSQL + Flyway (DB & Migration)  
+Hibernate (JPA)  
+Spring Security (bcrypt; JWT)  
+Jackson + springdoc-openapi (Swagger UI)  
+UI: JavaFX oder Thymeleaf  
+Testing: JUnit 5, Spring Boot Test, Testcontainers (Postgres), REST-assured  
+Docker + docker-compose; Actuator für Health/Metrics  
