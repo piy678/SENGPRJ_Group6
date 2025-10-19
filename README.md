@@ -56,16 +56,23 @@ Testing: JUnit 5, Spring Boot Test, Testcontainers (Postgres), REST-assured
 Docker + docker-compose; Actuator für Health/Metrics  
 
 ## Questions:
-Should the tool be web-based (browser) or desktop-based (JavaFX, Electron, etc.)? 
+Should the tool be web-based (browser) or desktop-based (JavaFX, Electron, etc.)?   
+Electron desktop app. Built with web tech, packaged to run locally on Windows/macOS/Linux.   
 
 Do we need to implement authentication or can we assume a single teacher and student?  
+Yes. Support separate accounts and roles for multiple teachers and students.   
 
 How detailed should the LEO structure be (tree hierarchy vs. simple list)?  
+As a graph. Nodes and relationships (not just a simple tree or flat list).   
 
 Should the visualization be graphical (like a dependency tree) or textual (list with status)?  
+Text/list view. A graphic diagram is considered too complex; a list is more precise for this use case.   
 
 Should we store the data locally or in a database (e.g. SQLite, MySQL)?  
+In a database. Use a proper DB (e.g., SQLite/MySQL) rather than local files only.  
 
 Is suggestion logic mandatory or optional (for “next possible LEOs”)?  
+Mandatory. The system must generate recommendations (e.g., next applicable LEOs).   
 
 Should grading levels (“not reached”, “partially reached”, “reached”) be customizable?  
+No. Use fixed levels, with “Unmark” as the fourth level in addition to the existing ones.   
