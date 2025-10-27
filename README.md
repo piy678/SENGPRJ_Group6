@@ -34,8 +34,8 @@ When a higher-level LEO is marked as Reached, all dependent (implied) lower-leve
 - RecommendationService 
 - [ ] Validation & error model: Bean Validation; global exception handler; consistent error body (code, message, optional traceId)
 - [ ] Security: login with hashed passwords (bcrypt/Argon2), RBAC (Admin/Teacher/Student), protect write endpoints
-- [ ] REST API (or JavaFX handlers): /leos, /students, /assessments, /recommendations with pagination/filtering/sorting; 
-- [ ]  UI (JavaFX or Web): LEO table, Teacher grading view, Student progress view (progress bars/filters), basic accessibility
+- [ ] REST API: /leos, /students, /assessments, /recommendations with pagination/filtering/sorting; 
+- [ ]  UI (Electron): LEO table, Teacher grading view, Student progress view (progress bars/filters), basic accessibility
 - [ ]  Import/Export: JSON import for LEO catalog; CSV/JSON export of results (define formats)
 - [ ]  Logging: structured logs; basic metrics if using Spring Boot Actuator
 - [ ]  Build & run: app config (application-dev.yml), profiles (dev/test), Dockerfile + docker-compose (app + DB)
@@ -51,7 +51,7 @@ Spring Boot (Web, Data JPA)
 Maven oder Gradle  
 PostgreSQL   
 Hibernate (JPA)    
-UI: JavaFX  
+UI: Electron  
 Testing: JUnit 5, Spring Boot Test, Testcontainers (Postgres), REST-assured  
 Docker + docker-compose; Actuator für Health/Metrics  
 
