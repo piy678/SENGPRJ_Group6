@@ -10,12 +10,12 @@ public class SearchSteps {
     public void aSetOfLEOsExistInCourse(String arg0) {
     }
 
-    @When("the user searches for LEOs by <filter> {string}")
-    public void theUserSearchesForLEOsByFilter(String arg0) {
+    @When("the user searches for LEOs by (.*) \"(.*)\"")
+    public void theUserSearchesForLEOsByFilterValue(String filter, String value) {
     }
 
-    @Then("only LEOs matching <filter> {string} are shown")
-    public void onlyLEOsMatchingFilterAreShown(String arg0) {
+    @Then("^only LEOs matching (.*) \"(.*)\" are shown$")
+    public void onlyLeosMatchingFilterValueAreShown(String filter, String value) {
     }
 
     @When("the user searches for LEOs by topic {string} and status {string}")
