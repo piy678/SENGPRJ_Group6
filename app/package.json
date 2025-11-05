@@ -1,0 +1,27 @@
+{
+  "name": "leo-electron-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "main": "electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"cross-env VITE_API=http://localhost:8080 vite\" \"wait-on tcp:8080 http-get://localhost:5173 && electron .\"",
+    "start": "electron .",
+    "build:fe": "vite build",
+    "build:app": "electron-builder"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^31.2.0",
+    "electron-builder": "^24.13.3",
+    "wait-on": "^7.2.0",
+    "vite": "^5.4.0"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  }
+}

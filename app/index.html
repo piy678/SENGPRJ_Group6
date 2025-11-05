@@ -1,0 +1,56 @@
+
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' http://localhost:5173;
+  connect-src 'self' http://localhost:8080 http://localhost:5173 ws://localhost:5173;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data:;
+">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LEO Assessment</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+   <!-- React Refresh Preamble for Vite -->
+<script type="module">
+  import RefreshRuntime from "/@react-refresh";
+  RefreshRuntime.injectIntoGlobalHook(window);
+  window.$RefreshReg$ = () => {};
+  window.$RefreshSig$ = () => (type) => type;
+  window.__vite_plugin_react_preamble_installed__ = true;
+</script>
+
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+<!-- <script type="module" src="/leo-electron-prototype/electron/main.js"></script> -->
+<!--
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LEO Assessment</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    
+<script type="module">
+  import RefreshRuntime from "/@react-refresh";
+  RefreshRuntime.injectIntoGlobalHook(window);
+  window.$RefreshReg$ = () => {};
+  window.$RefreshSig$ = () => (type) => type;
+  window.__vite_plugin_react_preamble_installed__ = true;
+</script>
+
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+-->
