@@ -1,0 +1,13 @@
+steps\performance\PageLoadingSteps.class
+steps\learner\SearchSteps.class
+steps\authoring\LeoCreationSteps.class
+steps\system\ErrorHandlingSteps.class
+steps\learner\MasteryViewSteps.class
+steps\assessment\LeoAssessmentSteps.class
+steps\system\CompatibilitySteps.class
+steps\learner\SuggestionsSteps.class
+steps\system\PermissionsSteps.class
+steps\usability\UiUsabilitySteps.class
+steps\system\SecurityStorageSteps.class
+steps\assessment\DependenciesSteps.class
+steps\system\AvailabilitySteps.class
