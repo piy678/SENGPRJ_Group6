@@ -42,7 +42,7 @@ public class DataInitializer implements CommandLineRunner {
         teacher.setFirstName("John");
         teacher.setLastName("Doe");
         teacher.setPasswordHash("password");   // тут пізніше буде bcrypt
-        teacher.setRole(UserRole.TEACHER);
+        teacher.setRole(UserRole.TEACHER.name());
         teacher.setIsActive(true);
         teacher = userRepository.save(teacher);
 
@@ -66,7 +66,7 @@ public class DataInitializer implements CommandLineRunner {
         student.setFirstName("Alice");
         student.setLastName("Student");
         student.setPasswordHash("password");
-        student.setRole(UserRole.STUDENT);
+        student.setRole(UserRole.STUDENT.name());
         student.setIsActive(true);
         student = userRepository.save(student);
 
@@ -114,7 +114,7 @@ public class DataInitializer implements CommandLineRunner {
         assessment.setStudent(student);
         assessment.setLeo(leoBasics);
         assessment.setAssessedBy(teacher);
-        assessment.setStatus(AssessmentStatus.REACHED);
+        assessment.setStatus(AssessmentStatus.REACHED.name());
         assessment.setNotes("Student has successfully reached the basic learning outcome.");
         assessment.setIsArchived(false);
         assessment.setAssessedAt(LocalDateTime.now());

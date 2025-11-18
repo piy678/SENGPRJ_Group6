@@ -2,12 +2,20 @@ package com.sensprj.leo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "suggestions", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"student_id", "leo_id"}, name = "uk_student_leo_suggestion")
-})
+@Table(
+        name = "suggestions",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"student_id", "leo_id"},
+                        name = "uk_student_leo_suggestion"
+                )
+        }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,4 +51,11 @@ public class Suggestion {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // neue Felder, damit DataInitializer kompiliert
+    @Column(precision = 5, scale = 2)
+    private BigDecimal readinessScore;
+
+    @Column
+    private Long lastPrerequisiteReachedDaysAgo;
 }
