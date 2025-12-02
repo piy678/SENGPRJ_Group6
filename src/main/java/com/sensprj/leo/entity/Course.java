@@ -2,6 +2,7 @@ package com.sensprj.leo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,8 +29,10 @@ public class Course {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "boolean default true")
-    private Boolean isActive;
+    // Default-Wert in Java + niemals null
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isActive = true;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -37,11 +40,35 @@ public class Course {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
+    @Builder.Default
     private Set<CourseEnrollment> enrollments = new HashSet<>();
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
+    @Builder.Default
     private Set<Leo> leos = new HashSet<>();
+
+    // ===== Lifecycle Hooks =====
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+
+        if (this.createdAt == null) {
+            this.createdAt = now;
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = now;
+        }
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

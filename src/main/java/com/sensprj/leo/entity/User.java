@@ -2,6 +2,7 @@ package com.sensprj.leo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,8 +37,9 @@ public class User {
     @Column(length = 255)
     private String lastName;
 
-    @Column(columnDefinition = "boolean default true")
-    private Boolean isActive;
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isActive = true;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -47,13 +49,38 @@ public class User {
 
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @Builder.Default
     private Set<Course> courses = new HashSet<>();
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @Builder.Default
     private Set<Assessment> assessments = new HashSet<>();
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @Builder.Default
     private Set<Suggestion> suggestions = new HashSet<>();
+
+    // Lifecycle hooks
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+
+        if (this.createdAt == null) {
+            this.createdAt = now;
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = now;
+        }
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
