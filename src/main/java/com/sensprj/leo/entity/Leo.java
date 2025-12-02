@@ -2,6 +2,7 @@ package com.sensprj.leo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,8 +32,9 @@ public class Leo {
     @Column(length = 255)
     private String topic;
 
-    @Column(columnDefinition = "boolean default true")
-    private Boolean isActive;
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isActive = true;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -40,6 +42,7 @@ public class Leo {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    // Prerequisites (self-referencing ManyToMany)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "leo_prerequisites",
@@ -47,9 +50,35 @@ public class Leo {
             inverseJoinColumns = @JoinColumn(name = "prerequisite_leo_id")
     )
     @ToString.Exclude
+    @Builder.Default
     private Set<Leo> prerequisites = new HashSet<>();
 
-    @OneToMany(mappedBy = "leo", cascade = CascadeType.ALL)
+    // Assessments
+    @OneToMany(mappedBy = "leo", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
+    @Builder.Default
     private Set<Assessment> assessments = new HashSet<>();
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+
+        if (this.createdAt == null) {
+            this.createdAt = now;
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = now;
+        }
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+    }
 }
