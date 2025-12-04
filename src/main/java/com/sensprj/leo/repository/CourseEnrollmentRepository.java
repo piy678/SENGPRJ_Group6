@@ -1,5 +1,6 @@
 package com.sensprj.leo.repository;
 
+import com.sensprj.leo.entity.Course;
 import com.sensprj.leo.entity.CourseEnrollment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,4 +12,6 @@ public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollme
     List<CourseEnrollment> findByStudentId(Long studentId);
     List<CourseEnrollment> findByCourseId(Long courseId);
     Optional<CourseEnrollment> findByCourseIdAndStudentId(Long courseId, Long studentId);
+    List<CourseEnrollment> findByCourse(Course course);
+
 }
