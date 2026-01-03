@@ -8,15 +8,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(
-        name = "assessments",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        columnNames = {"student_id", "leo_id"},
-                        name = "uk_student_leo_assessment"
-                )
-        }
-)
+//@Table(
+//        name = "assessments",
+//        uniqueConstraints = {
+//                @UniqueConstraint(
+//                        columnNames = {"student_id", "leo_id"},
+//                        name = "uk_student_leo_assessment"
+//                )
+//        }
+//)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

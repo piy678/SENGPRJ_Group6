@@ -23,6 +23,10 @@ public class Leo {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
+    @ManyToOne
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
+
     @Column(nullable = false, length = 255)
     private String name;
 

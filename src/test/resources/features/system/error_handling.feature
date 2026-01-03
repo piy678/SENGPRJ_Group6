@@ -7,7 +7,7 @@ Feature: Error handling
     When an <errorType> occurs
     Then the system displays "<message>" without exposing technical details
     Examples:
-      | errorType          | message                        |
-      | network_failure     | "Network unavailable"          |
-      | unauthorized_access | "Access denied"                |
-      | invalid_input       | "Please check your input data" |
+      | errorType           | message                      |
+      | network_failure     | Network unavailable          |
+      | unauthorized_access | Access denied                |
+      | invalid_input       | Please check your input data |

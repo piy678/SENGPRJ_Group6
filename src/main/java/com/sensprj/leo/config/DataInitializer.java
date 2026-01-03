@@ -169,6 +169,10 @@ public class DataInitializer implements CommandLineRunner {
         leoBasics.setDescription("Student understands the basics of functional and non-functional requirements.");
         leoBasics.setTopic("Requirements Engineering");
         leoBasics.setIsActive(true);
+        User teacher = userRepository.findByUsername("teacher1").orElseThrow();
+        leoBasics.setCreatedBy(teacher);
+
+        leoBasics.setCreatedBy(teacher);
         leoBasics = leoRepository.save(leoBasics);
 
         Leo leoAdvanced = new Leo();
@@ -177,6 +181,7 @@ public class DataInitializer implements CommandLineRunner {
         leoAdvanced.setDescription("Student can model and manage complex requirements.");
         leoAdvanced.setTopic("Requirements Engineering");
         leoAdvanced.setIsActive(true);
+        leoAdvanced.setCreatedBy(teacher1);
         leoAdvanced = leoRepository.save(leoAdvanced);
 
         // =========================
@@ -204,12 +209,12 @@ public class DataInitializer implements CommandLineRunner {
         assessment1.setAssessedAt(LocalDateTime.now().minusDays(1));
         assessmentRepository.save(assessment1);
 
-        // student2: auch irgendein Status, der IM ENUM EXISTIERT
+
         Assessment assessment2 = new Assessment();
         assessment2.setStudent(student2);
         assessment2.setLeo(leoBasics);
         assessment2.setAssessedBy(teacher1);
-        // HIER war vorher IN_PROGRESS – jetzt nehmen wir REACHED,
+
         assessment2.setStatus(AssessmentStatus.REACHED.name());
         assessment2.setNotes("Student is working on the basics.");
         assessment2.setIsArchived(false);
