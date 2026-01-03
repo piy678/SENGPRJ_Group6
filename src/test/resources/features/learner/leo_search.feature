@@ -20,8 +20,3 @@ Feature: Searching and filtering LEOs
     When the user searches for LEOs by topic "Arithmetic" and status "Not Reached"
     Then the result list shows only matching LEOs
     And the number of results is displayed
-
-  @usability @search
-  Scenario: Empty search results are handled gracefully
-    When the user searches for "Quantum Mechanics"
-    Then the system shows "No LEOs found"

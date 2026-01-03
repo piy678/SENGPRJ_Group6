@@ -16,7 +16,7 @@ public class SecurityStorageSteps {
     public void theDatabaseContainsStudentPersonalData() {
     }
 
-    @Then("the fields {string} and {string} are stored encrypted")
-    public void theFieldsAndAreStoredEncrypted(String arg0, String arg1) {
+    @Then("the fields {string} are stored encrypted")
+    public void theFieldsAndAreStoredEncrypted(String arg0) {
     }
 }

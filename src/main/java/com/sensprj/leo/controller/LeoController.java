@@ -3,16 +3,22 @@ package com.sensprj.leo.controller;
 import com.sensprj.leo.entity.Course;
 import com.sensprj.leo.entity.Leo;
 import com.sensprj.leo.entity.LeoDependency;
+import com.sensprj.leo.entity.User;
 import com.sensprj.leo.entity.enums.DependencyType;
 import com.sensprj.leo.repository.CourseRepository;
 import com.sensprj.leo.repository.LeoDependencyRepository;
 import com.sensprj.leo.repository.LeoRepository;
+import com.sensprj.leo.repository.UserRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/leos")
@@ -23,17 +29,71 @@ public class LeoController {
     private final LeoRepository leoRepository;
     private final CourseRepository courseRepository;
     private final LeoDependencyRepository dependencyRepository;
+    private final UserRepository userRepository;
 
 
     @GetMapping("/course/{courseId}")
     public List<LeoDto> getLeosForCourse(@PathVariable Long courseId) {
         Course course = courseRepository.findById(courseId).orElseThrow();
-        return leoRepository.findByCourse(course)
-                .stream()
-                .map(LeoDto::fromEntity)
-                .toList();
+        return leoRepository.findByCourse(course).stream().map(leo -> {
+            LeoDto dto = LeoDto.fromEntity(leo);
+            dto.setPrerequisiteCount(dependencyRepository.countByDependentLeoId(leo.getId()));
+            return dto;
+        }).toList();
     }
 
+    @GetMapping("/{leoId}/prerequisites")
+    public List<LeoDto> getPrerequisites(@PathVariable Long leoId) {
+        return dependencyRepository.findByDependentLeoId(leoId).stream()
+                .map(d -> LeoDto.fromEntity(d.getPrerequisiteLeo()))
+                .toList();
+    }
+    @GetMapping("/{leoId}/dependents")
+    public List<LeoDto> getDependents(@PathVariable Long leoId) {
+        List<LeoDependency> deps = dependencyRepository.findByPrerequisiteLeoId(leoId);
+        return deps.stream()
+                .map(d -> LeoDto.fromEntity(d.getDependentLeo()))
+                .toList();
+    }
+    @DeleteMapping("/{leoId}")
+    public ResponseEntity<?> deleteLeo(
+            @PathVariable Long leoId,
+            @RequestParam(defaultValue = "false") boolean force
+    ) {
+        Leo leo = leoRepository.findById(leoId).orElse(null);
+        if (leo == null) return ResponseEntity.notFound().build();
+
+        List<LeoDependency> dependents = dependencyRepository.findByPrerequisiteLeoId(leoId);
+
+        // Safety Check
+        if (!force && !dependents.isEmpty()) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("error", "DEPENDENCIES_EXIST");
+            body.put("count", dependents.size());
+            body.put("dependents", dependents.stream()
+                    .map(d -> LeoDto.fromEntity(d.getDependentLeo()))
+                    .toList());
+            return ResponseEntity.status(409).body(body);
+        }
+
+
+        if (!dependents.isEmpty()) {
+            dependencyRepository.deleteByPrerequisiteLeoId(leoId);
+        }
+
+        leoRepository.deleteById(leoId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/course/{courseId}/dependencies")
+    public List<Map<String, Long>> getDependencies(@PathVariable Long courseId) {
+        List<Object[]> rows = dependencyRepository.findEdgesByCourse(courseId);
+        return dependencyRepository.findEdgesByCourseId(courseId).stream().map(r -> {
+            Long source = (Long) r[0]; // prerequisite
+            Long target = (Long) r[1]; // dependent
+            return Map.of("source", source, "target", target);
+        }).toList();
+    }
 
     @PostMapping("/course/{courseId}")
     public ResponseEntity<LeoDto> createLeo(@PathVariable Long courseId,
@@ -43,13 +103,22 @@ public class LeoController {
         if (course == null) {
             return ResponseEntity.badRequest().build();
         }
-
+        User teacher = userRepository.findById(request.getCreatedById()).orElse(null);
         Leo leo = new Leo();
         leo.setCourse(course);
         leo.setName(request.getTitle());
         leo.setDescription(request.getDescription());
-        leo.setTopic("TODO");             // kannst du später dynamisch machen
+        leo.setTopic("TODO");
+        leo.setCreatedBy(teacher);
+        leo.setCreatedAt(LocalDateTime.now());
         leo.setIsActive(true);
+
+        if (teacher == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        leo.setCreatedBy(teacher);
+
         leo = leoRepository.save(leo);
 
 
@@ -66,6 +135,29 @@ public class LeoController {
 
         return ResponseEntity.ok(LeoDto.fromEntity(leo));
     }
+    @GetMapping("/course/{courseId}/search")
+    public List<LeoDto>  searchLeosForCourse(@PathVariable Long courseId,
+                                         @RequestParam(required = false) String q) {
+
+        Course course = courseRepository.findById(courseId).orElseThrow();
+
+        List<Leo> leos;
+        if (q == null || q.trim().isEmpty()) {
+            leos = leoRepository.findByCourse(course);
+        } else {
+            String query = q.trim();
+            // nur Name:
+            leos = leoRepository.findByCourseAndNameContainingIgnoreCase(course, query);
+
+            // oder Name ODER Description:
+            // leos = leoRepository.findByCourseAndNameContainingIgnoreCaseOrCourseAndDescriptionContainingIgnoreCase(
+            //        course, query, course, query
+            // );
+        }
+
+        return leos.stream().map(LeoDto::fromEntity).toList();
+    }
+
 
     // ===== DTOs =====
 
@@ -73,7 +165,8 @@ public class LeoController {
     public static class CreateLeoRequest {
         private String title;
         private String description;
-        private Long prerequisiteLeoId; // optional
+        private Long prerequisiteLeoId;
+        private Long createdById;
     }
 
     @Data
@@ -81,13 +174,19 @@ public class LeoController {
         private Long id;
         private String name;
         private String description;
+        private String topic;
+        private Boolean isActive;
+        private Long prerequisiteCount;
 
         public static LeoDto fromEntity(Leo leo) {
             LeoDto dto = new LeoDto();
             dto.id = leo.getId();
             dto.name = leo.getName();
             dto.description = leo.getDescription();
+            dto.topic = leo.getTopic();
+            dto.isActive = leo.getIsActive();
             return dto;
         }
     }
+
 }

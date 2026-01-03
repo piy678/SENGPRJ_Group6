@@ -3,13 +3,17 @@ package com.sensprj.leo.controller;
 import com.sensprj.leo.entity.*;
 import com.sensprj.leo.entity.enums.AssessmentStatus;
 import com.sensprj.leo.repository.*;
+import com.sensprj.leo.service.AssessmentService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/assessments")
@@ -22,7 +26,8 @@ public class AssessmentController {
     private final LeoRepository leoRepository;
     private final UserRepository userRepository;
     private final AssessmentRepository assessmentRepository;
-
+    private final AssessmentArchiveRepository assessmentArchiveRepository;
+    private final AssessmentService assessmentService;
 
     @GetMapping("/course/{courseId}/students")
     public List<StudentDto> getStudentsForCourse(@PathVariable Long courseId) {
@@ -42,34 +47,48 @@ public class AssessmentController {
                 .toList();
     }
 
-
+    @PreAuthorize("hasRole('TEACHER')")
     @PostMapping("/student/{studentId}")
-    public ResponseEntity<Void> saveAssessments(
+    public ResponseEntity<?> saveAssessments(
             @PathVariable Long studentId,
-            @RequestBody SaveAssessmentsRequest request) {
-
-        User student = userRepository.findById(studentId).orElse(null);
-        User teacher = userRepository.findById(request.getTeacherId()).orElse(null);
-        if (student == null || teacher == null) {
-            return ResponseEntity.badRequest().build();
-        }
+            @RequestBody SaveAssessmentsRequest request
+    ) {
+        User student = userRepository.findById(studentId).orElseThrow();
+        User teacher = userRepository.findById(request.getTeacherId()).orElseThrow();
 
         for (AssessmentEntry entry : request.getEntries()) {
-            Leo leo = leoRepository.findById(entry.getLeoId()).orElse(null);
-            if (leo == null) continue;
+            Leo leo = leoRepository.findById(entry.getLeoId()).orElseThrow();
 
-            Assessment a = new Assessment();
-            a.setStudent(student);
-            a.setLeo(leo);
-            a.setAssessedBy(teacher);
-            a.setStatus(entry.getStatus().name());
-            a.setIsArchived(false);
-            a.setAssessedAt(LocalDateTime.now());
-            assessmentRepository.save(a);
+            LocalDateTime assessedAt = entry.getAssessedAt() != null
+                    ? entry.getAssessedAt()
+                    : LocalDateTime.now();
+
+            assessmentService.upsertAssessment(
+                    student,
+                    leo,
+                    teacher,
+                    entry.getStatus(),
+                    assessedAt
+            );
         }
 
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/course/{courseId}/stats")
+    public Map<Long, Long> getLeoReachedStats(@PathVariable Long courseId) {
+        List<Object[]> rows = assessmentRepository.countReachedByLeoInCourse(courseId);
+
+        Map<Long, Long> result = new HashMap<>();
+        for (Object[] r : rows) {
+            Long leoId = (Long) r[0];
+            Long count = (Long) r[1];
+            result.put(leoId, count);
+        }
+        return result;
+    }
+
+
 
     // ===== DTOs =====
 
@@ -107,5 +126,6 @@ public class AssessmentController {
     public static class AssessmentEntry {
         private Long leoId;
         private AssessmentStatus status;
+        private LocalDateTime assessedAt;
     }
 }

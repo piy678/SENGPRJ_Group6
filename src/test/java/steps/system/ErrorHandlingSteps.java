@@ -7,26 +7,34 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ErrorHandlingSteps {
 
-    private String lastErrorType;
-    private String lastShownMessage;
+    private String lastUserMessage;
 
-    @When("an {string} occurs")
-    public void anErrorTypeOccurs(String errorType) {
-        this.lastErrorType = errorType;
+    @When("an {word} occurs")
+    public void an_errorType_occurs(String errorType) {
         switch (errorType) {
-            case "network_failure"     -> lastShownMessage = "Network unavailable";
-            case "unauthorized_access" -> lastShownMessage = "Access denied";
-            case "invalid_input"       -> lastShownMessage = "Please check your input data";
-            default -> lastShownMessage = "Unexpected error";
+            case "network_failure":
+                lastUserMessage = "Network unavailable";
+                break;
+            case "unauthorized_access":
+                lastUserMessage = "Access denied";
+                break;
+            case "invalid_input":
+                lastUserMessage = "Please check your input data";
+                break;
+            default:
+                fail("Unknown errorType in scenario: " + errorType);
         }
     }
 
     @Then("the system displays {string} without exposing technical details")
-    public void theSystemDisplaysWithoutExposingTechnicalDetails(String expected) {
-        // 1) fachliche Nachricht prüfen
-        assertEquals(expected, lastShownMessage, "Friendly message mismatch");
-        // 2) keine technischen Details
-        assertFalse(lastShownMessage.matches(".*(Exception|stack|\\bat\\b\\s+\\S+\\()"),
-                "Technical details must not be exposed");
+    public void the_system_displays_without_exposing_technical_details(String expectedMessage) {
+        assertEquals(expectedMessage, lastUserMessage);
+        assertNoTechnicalDetails(lastUserMessage);
+    }
+
+    private void assertNoTechnicalDetails(String msg) {
+        assertFalse(msg.contains("Exception"));
+        assertFalse(msg.contains("Stacktrace"));
+        assertFalse(msg.contains("org."));
     }
 }

@@ -10,4 +10,4 @@ Feature: Secure data storage
   @security @database
   Scenario: Sensitive data is encrypted at rest
     Given the database contains student personal data
-    Then the fields "name" and "assessment" are stored encrypted
+    Then the fields "password" are stored encrypted

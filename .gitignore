@@ -36,5 +36,9 @@ pnpm-debug.log*
 
 # ===== Secrets / Env =====
 .env
+
+# Maven build output
+target/
+*.class
 .env.*
 secrets.properties

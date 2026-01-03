@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -32,6 +34,10 @@ public class AuthController {
     }
 
 
+    @GetMapping("/debug/users")
+    public List<String> debugUsers() {
+        return userRepository.findAll().stream().map(User::getUsername).toList();
+    }
 
 
     @Data

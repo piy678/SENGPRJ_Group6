@@ -4,6 +4,8 @@ import com.sensprj.leo.entity.Leo;
 import com.sensprj.leo.entity.LeoDependency;
 import com.sensprj.leo.entity.enums.DependencyType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,9 +20,9 @@ public interface LeoDependencyRepository extends JpaRepository<LeoDependency, Lo
 
     List<LeoDependency> findByPrerequisiteLeo(Leo prerequisiteLeo);
 
-    List<LeoDependency> findByPrerequisiteLeoId(Long prerequisiteLeoId);
 
     boolean existsByDependentLeoAndPrerequisiteLeo(Leo dependentLeo, Leo prerequisiteLeo);
+    long countByDependentLeoId(Long leoId);
 
     boolean existsByDependentLeoIdAndPrerequisiteLeoId(Long dependentLeoId, Long prerequisiteLeoId);
 
@@ -42,4 +44,19 @@ public interface LeoDependencyRepository extends JpaRepository<LeoDependency, Lo
             Long prerequisiteLeoId,
             DependencyType dependencyType
     );
+
+    @Query("""
+  select d.prerequisiteLeo.id, d.dependentLeo.id
+  from LeoDependency d
+  where d.dependentLeo.course.id = :courseId
+    and d.dependencyType = com.sensprj.leo.entity.enums.DependencyType.PREREQUISITE
+""")
+    List<Object[]> findEdgesByCourseId(@Param("courseId") Long courseId);
+    @Query("""
+    select d.prerequisiteLeo.id, d.dependentLeo.id
+    from LeoDependency d
+    where d.dependentLeo.course.id = :courseId
+  """)
+    List<Object[]> findEdgesByCourse(@Param("courseId") Long courseId);
+    List<LeoDependency> findByPrerequisiteLeoId(Long prerequisiteLeoId);
 }
