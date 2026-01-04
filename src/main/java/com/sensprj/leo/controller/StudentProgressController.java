@@ -8,8 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.sensprj.leo.entity.enums.AssessmentStatus.REACHED;
 
 @RestController
 @RequestMapping("/api/students")
@@ -36,10 +39,22 @@ public class StudentProgressController {
         int notAchieved = 0;
         int unrated = 0;
 
+
+        java.util.Map<Long, Assessment> byLeoId = new java.util.HashMap<>();
+        for (Assessment a : assessments) {
+            if (a.getLeo() != null) {
+                byLeoId.put(a.getLeo().getId(), a);
+            }
+        }
+
         List<LeoRowDto> leoRows = new ArrayList<>();
 
         for (Assessment a : assessments) {
-            AssessmentStatus status = AssessmentStatus.valueOf(a.getStatus());
+            Leo leo = a.getLeo();
+            if (leo == null) continue;
+
+
+            AssessmentStatus status = parseStatus(a.getStatus());
 
             switch (status) {
                 case REACHED -> achieved++;
@@ -48,29 +63,122 @@ public class StudentProgressController {
                 default -> unrated++;
             }
 
-            Leo leo = a.getLeo();
 
-
-            String dependsOn = leoDependencyRepository.findByDependentLeo(leo)
-                    .stream()
-                    .findFirst()
-                    .map(dep -> dep.getPrerequisiteLeo().getName())
+            List<LeoDependency> prereqs = leoDependencyRepository.findByDependentLeo(leo);
+            String dependsOn = prereqs.isEmpty()
+                    ? "No dependencies"
+                    : prereqs.stream()
+                    .map(d -> d.getPrerequisiteLeo().getName())
+                    .distinct()
+                    .reduce((x, y) -> x + ", " + y)
                     .orElse("No dependencies");
 
             LeoRowDto row = new LeoRowDto();
+            row.setLeoId(leo.getId());
             row.setTitle(leo.getName());
             row.setDependsOn(dependsOn);
             row.setStatus(mapStatusLabel(status));
+
+            LocalDateTime last = a.getUpdatedAt() != null ? a.getUpdatedAt() : a.getAssessedAt();
+            row.setLastUpdated(last);
+
             leoRows.add(row);
         }
 
         int total = achieved + partially + notAchieved + unrated;
 
+        List<SuggestionDto> suggestionDtos = new ArrayList<>();
+        List<BlockedDto> blockedDtos = new ArrayList<>();
+        java.util.Map<Long, Leo> allLeoMap = new java.util.HashMap<>();
 
-        List<Suggestion> suggestions = suggestionRepository.findByStudent(student);
-        List<String> suggestionTexts = suggestions.stream()
-                .map(Suggestion::getSuggestedReason)
-                .toList();
+
+        for (Assessment a : assessments) {
+            if (a.getLeo() != null) {
+                allLeoMap.put(a.getLeo().getId(), a.getLeo());
+            }
+        }
+
+
+        for (Leo baseLeo : new ArrayList<>(allLeoMap.values())) {
+
+            for (LeoDependency d : leoDependencyRepository.findByDependentLeo(baseLeo)) {
+                if (d.getPrerequisiteLeo() != null) {
+                    allLeoMap.put(d.getPrerequisiteLeo().getId(), d.getPrerequisiteLeo());
+                }
+            }
+            for (LeoDependency d : leoDependencyRepository.findByPrerequisiteLeo(baseLeo)) {
+                if (d.getDependentLeo() != null) {
+                    allLeoMap.put(d.getDependentLeo().getId(), d.getDependentLeo());
+                }
+            }
+        }
+
+        List<Leo> allLeos = new ArrayList<>(allLeoMap.values());
+
+        for (Leo leo : allLeos) {
+
+
+            Assessment existing = byLeoId.get(leo.getId());
+            if (existing != null && parseStatus(existing.getStatus()) == AssessmentStatus.REACHED) {
+                continue;
+            }
+
+            List<LeoDependency> prereqs = leoDependencyRepository.findByDependentLeo(leo);
+
+
+            if (prereqs.isEmpty()) {
+                SuggestionDto s = new SuggestionDto();
+                s.setLeoTitle(leo.getName());
+                s.setHasDependencies(false);
+                s.setReady(true);
+                s.setRationale("No prerequisites. You can start anytime.");
+                suggestionDtos.add(s);
+                continue;
+            }
+
+
+            List<String> missing = new ArrayList<>();
+
+            for (LeoDependency dep : prereqs) {
+                Leo prereqLeo = dep.getPrerequisiteLeo();
+                Assessment prereqAss = byLeoId.get(prereqLeo.getId());
+
+                boolean reached = prereqAss != null
+                        && parseStatus(prereqAss.getStatus()) == AssessmentStatus.REACHED;
+
+                if (!reached) {
+                    missing.add(prereqLeo.getName());
+                }
+            }
+
+            if (missing.isEmpty()) {
+
+                Leo prereqLeo = prereqs.get(prereqs.size() - 1).getPrerequisiteLeo();
+                Assessment prereqAss = byLeoId.get(prereqLeo.getId());
+                LocalDateTime done = prereqAss.getUpdatedAt() != null
+                        ? prereqAss.getUpdatedAt()
+                        : prereqAss.getAssessedAt();
+
+                SuggestionDto s = new SuggestionDto();
+                s.setLeoTitle(leo.getName());
+                s.setHasDependencies(true);
+                s.setReady(true);
+                s.setPrerequisiteTitle(prereqLeo.getName());
+                s.setPrerequisiteCompletedOn(done);
+                s.setRationale("Prerequisite '" + prereqLeo.getName() + "' completed on " + done.toLocalDate());
+
+                suggestionDtos.add(s);
+            } else {
+
+                BlockedDto b = new BlockedDto();
+                b.setLeoTitle(leo.getName());
+                b.setMissingPrerequisites(missing);
+                b.setText("This LEO requires prerequisites: " + String.join(", ", missing));
+                b.setTip("Complete prerequisites first");
+                blockedDtos.add(b);
+            }
+        }
+
 
         StudentProgressDto dto = new StudentProgressDto();
         dto.setTotalLeos(total);
@@ -79,10 +187,36 @@ public class StudentProgressController {
         dto.setNotAchieved(notAchieved);
         dto.setUnrated(unrated);
         dto.setLeoStatuses(leoRows);
-        dto.setSuggestions(suggestionTexts);
+        dto.setBlocked(blockedDtos);
+        dto.setSuggestions(suggestionDtos);
+        dto.setBlocked(blockedDtos);
+
 
         return ResponseEntity.ok(dto);
     }
+
+    private AssessmentStatus parseStatus(String raw) {
+        if (raw == null || raw.isBlank()) return AssessmentStatus.UNMARKED;
+
+
+        String v = raw.trim().toUpperCase();
+
+
+
+        try {
+            return AssessmentStatus.valueOf(v);
+        } catch (IllegalArgumentException ex) {
+
+            return switch (v) {
+                case "ACHIEVED" -> AssessmentStatus.REACHED;
+                case "PARTIALLY" -> AssessmentStatus.PARTIALLY_REACHED;
+                case "NOT ACHIEVED", "NOT_ACHIEVED" -> AssessmentStatus.NOT_REACHED;
+                default -> AssessmentStatus.UNMARKED;
+            };
+        }
+    }
+
+
 
     private String mapStatusLabel(AssessmentStatus status) {
         return switch (status) {
@@ -102,14 +236,37 @@ public class StudentProgressController {
         private int partially;
         private int notAchieved;
         private int unrated;
+        private List<SuggestionDto> suggestions;
         private List<LeoRowDto> leoStatuses;
-        private List<String> suggestions;
+        private List<BlockedDto> blocked;
+
+
     }
 
     @Data
     public static class LeoRowDto {
+        private Long leoId;
         private String title;
         private String dependsOn;
         private String status;
+        private LocalDateTime lastUpdated;
     }
+    @Data
+    public static class SuggestionDto {
+        private String leoTitle;
+        private boolean hasDependencies;
+        private String prerequisiteTitle;
+        private LocalDateTime prerequisiteCompletedOn;
+        private String rationale;
+        private boolean ready;
+    }
+    @Data
+    public static class BlockedDto {
+        private String leoTitle;
+        private List<String> missingPrerequisites;
+        private String text;
+        private String tip;
+    }
+
+
 }

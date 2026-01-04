@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +76,11 @@ public class AssessmentController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/course/{courseId}/student/{studentId}/grade")
+    public ResponseEntity<?> getGrade(@PathVariable Long courseId, @PathVariable Long studentId) {
+        return ResponseEntity.ok(assessmentService.calculateGradeForStudent(courseId, studentId));
+    }
+
     @GetMapping("/course/{courseId}/stats")
     public Map<Long, Long> getLeoReachedStats(@PathVariable Long courseId) {
         List<Object[]> rows = assessmentRepository.countReachedByLeoInCourse(courseId);
@@ -86,6 +92,16 @@ public class AssessmentController {
             result.put(leoId, count);
         }
         return result;
+    }
+
+    @PreAuthorize("hasRole('TEACHER')")
+    @PostMapping("/backfill/not-reached")
+    public ResponseEntity<String> backfill(@RequestParam Long teacherId) {
+
+        User teacher = userRepository.findById(teacherId).orElseThrow();
+
+        int created = assessmentService.backfillNotReachedForAll(teacher);
+        return ResponseEntity.ok("Created default NOT_REACHED assessments: " + created);
     }
 
 

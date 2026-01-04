@@ -12,4 +12,7 @@ public interface AssessmentArchiveRepository extends JpaRepository<AssessmentArc
 
     @Query("SELECT a FROM AssessmentArchive a WHERE a.assessment.id = ?1 ORDER BY a.archivedAt DESC")
     List<AssessmentArchive> findHistoryByAssessmentId(Long assessmentId);
+
+    long deleteByAssessmentId(Long assessmentId);
+
 }

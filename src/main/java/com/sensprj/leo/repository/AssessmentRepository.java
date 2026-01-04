@@ -2,6 +2,7 @@ package com.sensprj.leo.repository;
 
 import com.sensprj.leo.entity.Assessment;
 import com.sensprj.leo.entity.Course;
+import com.sensprj.leo.entity.Leo;
 import com.sensprj.leo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,8 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
     List<Assessment> findByLeoCourse(Course course);
     List<Assessment> findByStudent(User student);
 
+    boolean existsByStudentAndLeoAndIsArchivedFalse(User student, Leo leo);
+    long deleteByLeoId(Long leoId);
 
     @Query("SELECT a FROM Assessment a WHERE a.student.id = ?1 AND a.leo.course.id = ?2 AND a.isArchived = false")
     List<Assessment> findActiveAssessmentsByStudentAndCourse(Long studentId, Long courseId);
@@ -44,5 +47,6 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
   group by a.leo.id
 """)
     List<Object[]> countReachedByLeoInCourse(@Param("courseId") Long courseId);
+
 
 }
