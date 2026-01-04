@@ -7,11 +7,11 @@ import com.sensprj.leo.repository.AssessmentRepository;
 import com.sensprj.leo.repository.CourseEnrollmentRepository;
 import com.sensprj.leo.repository.CourseRepository;
 import com.sensprj.leo.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -113,14 +113,26 @@ public class CourseController {
 //    }
 
 
-    @DeleteMapping("/{courseId}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable Long courseId) {
-        if (!courseRepository.existsById(courseId)) {
-            return ResponseEntity.notFound().build();
-        }
-        courseRepository.deleteById(courseId);
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
+//        if (!courseRepository.existsById(id)) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        courseRepository.deleteById(id);
+//        return ResponseEntity.noContent().build(); // 204
+//    }
+
+    @Transactional
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
+        if (!courseRepository.existsById(id)) return ResponseEntity.notFound().build();
+
+        enrollmentRepository.deleteByCourseId(id);
+        courseRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
 
     // ===== DTOs =====
 

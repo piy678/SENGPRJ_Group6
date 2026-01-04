@@ -9,11 +9,13 @@ import com.sensprj.leo.repository.CourseRepository;
 import com.sensprj.leo.repository.LeoDependencyRepository;
 import com.sensprj.leo.repository.LeoRepository;
 import com.sensprj.leo.repository.UserRepository;
+import com.sensprj.leo.service.AssessmentService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.sensprj.leo.service.LeoService;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -30,6 +32,8 @@ public class LeoController {
     private final CourseRepository courseRepository;
     private final LeoDependencyRepository dependencyRepository;
     private final UserRepository userRepository;
+    private final AssessmentService assessmentService;
+    private final LeoService leoService;
 
 
     @GetMapping("/course/{courseId}")
@@ -60,30 +64,12 @@ public class LeoController {
             @PathVariable Long leoId,
             @RequestParam(defaultValue = "false") boolean force
     ) {
-        Leo leo = leoRepository.findById(leoId).orElse(null);
-        if (leo == null) return ResponseEntity.notFound().build();
-
-        List<LeoDependency> dependents = dependencyRepository.findByPrerequisiteLeoId(leoId);
-
-        // Safety Check
-        if (!force && !dependents.isEmpty()) {
-            Map<String, Object> body = new HashMap<>();
-            body.put("error", "DEPENDENCIES_EXIST");
-            body.put("count", dependents.size());
-            body.put("dependents", dependents.stream()
-                    .map(d -> LeoDto.fromEntity(d.getDependentLeo()))
-                    .toList());
-            return ResponseEntity.status(409).body(body);
-        }
-
-
-        if (!dependents.isEmpty()) {
-            dependencyRepository.deleteByPrerequisiteLeoId(leoId);
-        }
-
-        leoRepository.deleteById(leoId);
+        leoService.deleteLeo(leoId, force);
         return ResponseEntity.noContent().build();
     }
+
+
+
 
     @GetMapping("/course/{courseId}/dependencies")
     public List<Map<String, Long>> getDependencies(@PathVariable Long courseId) {
@@ -121,6 +107,7 @@ public class LeoController {
 
         leo = leoRepository.save(leo);
 
+        assessmentService.createDefaultNotReachedForLeo(leo, teacher);
 
         if (request.getPrerequisiteLeoId() != null) {
             Leo prereq = leoRepository.findById(request.getPrerequisiteLeoId()).orElse(null);
@@ -135,6 +122,16 @@ public class LeoController {
 
         return ResponseEntity.ok(LeoDto.fromEntity(leo));
     }
+
+    @PostMapping("/backfill-not-reached")
+    public ResponseEntity<?> backfill(@RequestParam Long teacherId) {
+        User teacher = userRepository.findById(teacherId).orElse(null);
+        if (teacher == null) return ResponseEntity.badRequest().body("Teacher not found");
+
+        int created = assessmentService.backfillNotReachedForAll(teacher);
+        return ResponseEntity.ok(Map.of("created", created));
+    }
+
     @GetMapping("/course/{courseId}/search")
     public List<LeoDto>  searchLeosForCourse(@PathVariable Long courseId,
                                          @RequestParam(required = false) String q) {
