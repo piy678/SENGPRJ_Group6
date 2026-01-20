@@ -45,7 +45,8 @@ public class AssessmentService {
                 String prereqStatus = assessmentRepository
                         .findByStudentIdAndLeoIdAndIsArchivedFalse(studentId, prereqLeoId)
                         .map(Assessment::getStatus)
-                        .orElse("NOT_REACHED");
+                        .orElse("UNMARKED");
+
 
                 if (!"REACHED".equalsIgnoreCase(prereqStatus)) {
                     ready = false;
@@ -60,7 +61,7 @@ public class AssessmentService {
             String status = assessmentRepository
                     .findByStudentIdAndLeoIdAndIsArchivedFalse(studentId, leo.getId())
                     .map(Assessment::getStatus)
-                    .orElse("NOT_REACHED");
+                    .orElse("UNMARKED");
 
             if ("REACHED".equalsIgnoreCase(status)) reached++;
         }
@@ -128,7 +129,7 @@ public class AssessmentService {
                         a.setStudent(student);
                         a.setLeo(leo);
                         a.setAssessedBy(teacher);
-                        a.setStatus("NOT_REACHED");
+                        a.setStatus("UNMARKED");
                         a.setIsArchived(false);
 
                         assessmentRepository.save(a);

@@ -45,16 +45,28 @@ public class ProgressController {
             if (dto == null) continue;
 
             dto.total++;
-            AssessmentStatus status = AssessmentStatus.valueOf(a.getStatus());
+
+            AssessmentStatus status;
+            try {
+                String raw = a.getStatus();
+                status = (raw == null || raw.isBlank())
+                        ? AssessmentStatus.UNMARKED
+                        : AssessmentStatus.valueOf(raw.trim().toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                status = AssessmentStatus.UNMARKED;
+            }
+
             switch (status) {
                 case REACHED -> dto.achieved++;
                 case PARTIALLY_REACHED -> dto.partially++;
-                default -> dto.notAssessed++;
+                case NOT_REACHED -> dto.notAchieved++;
+                case UNMARKED -> dto.unmarked++;
             }
+
         }
 
         map.values().forEach(dto -> {
-            dto.progress = dto.total == 0 ? 0 : (dto.achieved * 100 / dto.total);
+            dto.progress = dto.total == 0 ? 0 : ((dto.achieved + dto.partially) * 100 / dto.total);
         });
 
         return new ArrayList<>(map.values());
@@ -66,7 +78,8 @@ public class ProgressController {
         private String name;
         private int achieved;
         private int partially;
-        private int notAssessed;
+        private int unmarked;
+        private int notAchieved;
         private int total;
         private int progress;
     }
