@@ -25,7 +25,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/leos")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
 public class LeoController {
 
     private final LeoRepository leoRepository;
@@ -74,11 +73,12 @@ public class LeoController {
     @GetMapping("/course/{courseId}/dependencies")
     public List<Map<String, Long>> getDependencies(@PathVariable Long courseId) {
         List<Object[]> rows = dependencyRepository.findEdgesByCourse(courseId);
-        return dependencyRepository.findEdgesByCourseId(courseId).stream().map(r -> {
-            Long source = (Long) r[0]; // prerequisite
-            Long target = (Long) r[1]; // dependent
+        return dependencyRepository.findEdgesByCourse(courseId).stream().map(r -> {
+            Long source = (Long) r[0];
+            Long target = (Long) r[1];
             return Map.of("source", source, "target", target);
         }).toList();
+
     }
 
     @PostMapping("/course/{courseId}")

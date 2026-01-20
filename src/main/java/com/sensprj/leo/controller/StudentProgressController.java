@@ -17,12 +17,10 @@ import static com.sensprj.leo.entity.enums.AssessmentStatus.REACHED;
 @RestController
 @RequestMapping("/api/students")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
 public class StudentProgressController {
 
     private final UserRepository userRepository;
     private final AssessmentRepository assessmentRepository;
-    private final SuggestionRepository suggestionRepository;
     private final LeoDependencyRepository leoDependencyRepository;
 
     @GetMapping("/{studentId}/progress")
@@ -189,7 +187,6 @@ public class StudentProgressController {
         dto.setLeoStatuses(leoRows);
         dto.setBlocked(blockedDtos);
         dto.setSuggestions(suggestionDtos);
-        dto.setBlocked(blockedDtos);
 
 
         return ResponseEntity.ok(dto);

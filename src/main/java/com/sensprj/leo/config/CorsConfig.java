@@ -18,7 +18,8 @@ public class CorsConfig {
         // Frontend Origins (lokal + Docker)
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://localhost:5174"
+                "http://localhost:5174",
+                "http://16.170.165.182:5174"
         ));
 
         // Methoden erlauben (wichtig für Preflight/OPTIONS)
