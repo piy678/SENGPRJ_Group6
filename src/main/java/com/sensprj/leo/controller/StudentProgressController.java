@@ -36,6 +36,8 @@ public class StudentProgressController {
         int partially = 0;
         int notAchieved = 0;
         int unrated = 0;
+        int unmarked = 0;
+
 
 
         java.util.Map<Long, Assessment> byLeoId = new java.util.HashMap<>();
@@ -58,7 +60,7 @@ public class StudentProgressController {
                 case REACHED -> achieved++;
                 case PARTIALLY_REACHED -> partially++;
                 case NOT_REACHED -> notAchieved++;
-                default -> unrated++;
+                case UNMARKED -> unmarked++;
             }
 
 
@@ -83,7 +85,10 @@ public class StudentProgressController {
             leoRows.add(row);
         }
 
-        int total = achieved + partially + notAchieved + unrated;
+        int total = achieved + partially + notAchieved + unmarked;
+        int graded = achieved + partially + notAchieved;
+        int progress = total == 0 ? 0 : (int) Math.round((graded * 100.0) / total);
+
 
         List<SuggestionDto> suggestionDtos = new ArrayList<>();
         List<BlockedDto> blockedDtos = new ArrayList<>();
@@ -183,10 +188,12 @@ public class StudentProgressController {
         dto.setAchieved(achieved);
         dto.setPartially(partially);
         dto.setNotAchieved(notAchieved);
-        dto.setUnrated(unrated);
+        //dto.setUnrated(unrated);
         dto.setLeoStatuses(leoRows);
         dto.setBlocked(blockedDtos);
         dto.setSuggestions(suggestionDtos);
+        dto.setUnmarked(unmarked);
+        dto.setProgress(progress);
 
 
         return ResponseEntity.ok(dto);
@@ -220,7 +227,8 @@ public class StudentProgressController {
             case REACHED -> "Achieved";
             case PARTIALLY_REACHED -> "Partially";
             case NOT_REACHED -> "Not achieved";
-            default -> "Unrated";
+            case UNMARKED -> "Unmarked";
+
         };
     }
 
@@ -228,11 +236,15 @@ public class StudentProgressController {
 
     @Data
     public static class StudentProgressDto {
+        private Long studentId;
+        private String name;
         private int totalLeos;
         private int achieved;
         private int partially;
+        private int unmarked;
         private int notAchieved;
-        private int unrated;
+        private int progress;
+        //private int unrated;
         private List<SuggestionDto> suggestions;
         private List<LeoRowDto> leoStatuses;
         private List<BlockedDto> blocked;
