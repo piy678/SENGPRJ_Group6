@@ -17,7 +17,6 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/progress")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
 public class ProgressController {
 
     private final CourseRepository courseRepository;

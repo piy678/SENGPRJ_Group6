@@ -19,7 +19,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/assessments")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
 public class AssessmentController {
 
     private final CourseRepository courseRepository;
