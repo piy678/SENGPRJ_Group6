@@ -94,8 +94,8 @@ public class AssessmentService {
                 Assessment a = new Assessment();
                 a.setStudent(student);
                 a.setLeo(leo);
-                a.setAssessedBy(teacher);      // Pflichtfeld!
-                a.setStatus("NOT_REACHED");    // bei dir String
+                a.setAssessedBy(teacher);
+                a.setStatus("UNMARKED");
                 a.setIsArchived(false);
 
                 assessmentRepository.save(a);
@@ -159,7 +159,7 @@ public class AssessmentService {
             String prereqStatus = assessmentRepository
                     .findByStudentIdAndLeoIdAndIsArchivedFalse(student.getId(), prereqLeoId)
                     .map(Assessment::getStatus)
-                    .orElse("NOT_REACHED");
+                    .orElse("UNMARKED");
 
             if (!"REACHED".equalsIgnoreCase(prereqStatus)) {
                 throw new ResponseStatusException(
