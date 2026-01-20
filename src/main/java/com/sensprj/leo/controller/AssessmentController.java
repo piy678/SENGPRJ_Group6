@@ -100,7 +100,7 @@ public class AssessmentController {
         User teacher = userRepository.findById(teacherId).orElseThrow();
 
         int created = assessmentService.backfillNotReachedForAll(teacher);
-        return ResponseEntity.ok("Created default NOT_REACHED assessments: " + created);
+        return ResponseEntity.ok("Created default UNMARKED assessments: " + created);
     }
 
 
