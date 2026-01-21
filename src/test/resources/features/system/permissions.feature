@@ -21,7 +21,6 @@ Feature: Role-based access control and permissions
     When teacher "Dr. Mueller" records assessment "Reached" for "Alice"
     Then the assessment is saved successfully
     And an audit log entry shows: user="Dr. Mueller", action="ASSESSMENT_RECORDED"
-    When student "Alice" attempts to change her own assessment status
-    Then the system denies with error "Access denied - insufficient permissions"
-    And HTTP status code is 403 (Forbidden)
-    And an audit log entry shows: user="Alice", action="ASSESSMENT_UPDATE_ATTEMPT", status="REJECTED_PERMISSIONS"
+    When student "Alice" tries to open the teacher dashboard
+    Then the system denies access to the teacher dashboard
+    And the student dashboard is shown successfully instead

@@ -69,8 +69,7 @@ public class SearchSteps {
 
     @And("the number of results is displayed")
     public void theNumberOfResultsIsDisplayed() {
-        // “Displayed” = wir prüfen nur, dass man die Anzahl bestimmen kann
-        Assertions.assertTrue(results.size() >= 0);
+          Assertions.assertTrue(results.size() >= 0);
     }
 
     // Helpers

@@ -18,8 +18,4 @@ public interface LeoRepository extends JpaRepository<Leo, Long> {
 
     List<Leo> findByCourseAndNameContainingIgnoreCase(Course course, String namePart);
 
-
-//    List<Leo> findByCourseAndNameContainingIgnoreCaseOrCourseAndDescriptionContainingIgnoreCase(
-//            Course course, String namePart, Course course2, String descPart
-//    );
 }

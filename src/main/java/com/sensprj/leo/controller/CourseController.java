@@ -94,34 +94,6 @@ public class CourseController {
     }
 
 
-
-//    @PostMapping
-//    public ResponseEntity<CourseDto> createCourse(@RequestBody CreateCourseRequest request) {
-//        User teacher = userRepository.findById(request.getTeacherId()).orElse(null);
-//        if (teacher == null) {
-//            return ResponseEntity.badRequest().build();
-//        }
-//
-//        Course course = new Course();
-//        course.setName(request.getName());
-//        course.setTeacher(teacher);
-//        course.setIsActive(true);
-//
-//        course = courseRepository.save(course);
-//        return ResponseEntity.ok(CourseDto.fromEntity(course));
-//    }
-
-
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
-//        if (!courseRepository.existsById(id)) {
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        courseRepository.deleteById(id);
-//        return ResponseEntity.noContent().build(); // 204
-//    }
-
     @Transactional
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
