@@ -16,8 +16,14 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    private final AuditAccessDeniedHandler deniedHandler;
+
+    public SecurityConfig(AuditAccessDeniedHandler deniedHandler) {
+        this.deniedHandler = deniedHandler;
+    }
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, AuditAccessDeniedHandler deniedHandler) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
@@ -25,18 +31,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().permitAll()
-                        // Teacher darf Assessment erstellen/ändern
+
+                        // Teacher-only: Änderungen an assessments
                         .requestMatchers(HttpMethod.POST,  "/api/assessments/**").hasRole("TEACHER")
                         .requestMatchers(HttpMethod.PUT,   "/api/assessments/**").hasRole("TEACHER")
                         .requestMatchers(HttpMethod.PATCH, "/api/assessments/**").hasRole("TEACHER")
                         .requestMatchers(HttpMethod.DELETE,"/api/assessments/**").hasRole("TEACHER")
 
-                        // alles andere: nur eingeloggt (sonst würdest du wieder alles offen lassen)
+                        // alles andere: eingeloggt
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable());
+                // zum Testen erstmal aktiv lassen (sonst 401)
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
@@ -45,7 +51,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://13.53.169.202:5174"));
-        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
@@ -53,5 +59,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 }
