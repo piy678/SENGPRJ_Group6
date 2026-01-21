@@ -17,8 +17,6 @@ public class LeoCreationSteps {
         String name = data.get("name");
         String description = data.get("description");
         String course = data.get("course");
-
-        // call service or store in test context
     }
 
     @Given("teacher {string} is on the LEO authoring page for course {string}")
@@ -37,7 +35,7 @@ public class LeoCreationSteps {
         String createdBy = attributes.get("created_by");
         String isActive = attributes.get("is_active");
 
-        // Assertions or checks go here later
+
     }
 
 
@@ -69,8 +67,7 @@ public class LeoCreationSteps {
             String view = row.get("View");
             String display = row.get("Display");
 
-            // Later you can assert UI / API output
-            // For now it can stay empty or store in context
+
         }
     }
 

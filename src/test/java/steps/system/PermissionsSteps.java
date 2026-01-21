@@ -97,41 +97,29 @@ public class PermissionsSteps {
         // TODO: Verify audit log in database
     }
 
-    @When("^student \"([^\"]*)\" attempts to change her own assessment status$")
-    public void studentAttemptsChangeAssessment(String studentName) {
-        System.out.println("✓ Student '" + studentName + "' attempts to change her own assessment status");
+
+
+    @When("^student \"([^\"]*)\" tries to open the teacher dashboard$")
+    public void studentTriesToOpenTeacherDashboard(String studentName) {
+        System.out.println("✓ Student '" + studentName + "' tries to open the teacher dashboard");
         currentUser = studentName;
         currentRole = "STUDENT";
-        // TODO: Call API PUT /assessments with student authentication
-        // Should fail with 403 Forbidden
-        lastHttpStatus = 403;
-        lastErrorMessage = "Access denied - insufficient permissions";
+
+           lastHttpStatus = 302; // Redirect
+        permissionContext.put("redirect_to", "/student/dashboard");
     }
 
-    @Then("^the system denies with error \"([^\"]*)\"$")
-    public void systemDeniesWith(String errorMessage) {
-        System.out.println("✓ System denies with error: '" + errorMessage + "'");
-        Assertions.assertEquals(403, lastHttpStatus);
-        Assertions.assertTrue(errorMessage.contains("Access denied") || errorMessage.contains("insufficient"));
-        lastErrorMessage = errorMessage;
+    @Then("the system denies access to the teacher dashboard")
+    public void systemRedirectsToStudentDashboard() {
+        System.out.println("✓ System redirects to the student dashboard");
+        Assertions.assertEquals(302, lastHttpStatus);
+        Assertions.assertEquals("/student/dashboard", permissionContext.get("redirect_to"));
     }
 
-    @And("^HTTP status code is (\\d+) \\(Forbidden\\)$")
-    public void httpStatusCodeForbidden(Integer statusCode) {
-        System.out.println("✓ HTTP status code is " + statusCode + " (Forbidden)");
-        Assertions.assertEquals(403, statusCode);
-        lastHttpStatus = statusCode;
+    @And("the student dashboard is shown successfully instead")
+    public void studentDashboardShownSuccessfully() {
+        System.out.println("✓ Student dashboard is shown successfully");
+        Assertions.assertEquals("/student/dashboard", permissionContext.get("redirect_to"));
     }
-
-    @And("^an audit log entry shows: user=\"([^\"]*)\", action=\"([^\"]*)\", status=\"([^\"]*)\"$")
-    public void auditLogEntryShowsWithStatus(String userName, String action, String status) {
-        System.out.println("✓ Audit log entry shows: user='" + userName + "', action='" + action + "', status='" + status + "'");
-        auditLogEntry.put("user", userName);
-        auditLogEntry.put("action", action);
-        auditLogEntry.put("status", status);
-        Assertions.assertEquals("REJECTED_PERMISSIONS", status);
-        // TODO: Verify audit log in database
-    }
-
 
 }

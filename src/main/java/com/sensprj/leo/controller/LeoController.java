@@ -145,11 +145,6 @@ public class LeoController {
             String query = q.trim();
             // nur Name:
             leos = leoRepository.findByCourseAndNameContainingIgnoreCase(course, query);
-
-            // oder Name ODER Description:
-            // leos = leoRepository.findByCourseAndNameContainingIgnoreCaseOrCourseAndDescriptionContainingIgnoreCase(
-            //        course, query, course, query
-            // );
         }
 
         return leos.stream().map(LeoDto::fromEntity).toList();
