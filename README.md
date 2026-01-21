@@ -193,8 +193,8 @@ Overall, the project helped us strengthen our skills in backend development with
 All required evidence for grading criteria has been submitted via **Moodle** as specified.
 
 
-
 ## Personal Contribution
+
 All group members contributed actively to the project.
 
 Contributions included:
@@ -203,6 +203,11 @@ Contributions included:
 - Testing and debugging
 - Deployment and documentation
 
+Detailed individual contributions are documented in the complete project plan and task overview are available here:  
+https://github.com/users/piy678/projects/7
+
+For grading purposes, the GitHub Project board serves as the primary source of
+project management evidence.
 
 
 ## Personal Development
