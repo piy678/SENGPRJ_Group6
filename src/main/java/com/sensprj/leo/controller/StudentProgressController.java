@@ -22,15 +22,45 @@ public class StudentProgressController {
     private final UserRepository userRepository;
     private final AssessmentRepository assessmentRepository;
     private final LeoDependencyRepository leoDependencyRepository;
+    private final CourseEnrollmentRepository courseEnrollmentRepository;
+    private final SuggestionRepository suggestionRepository;
+
+    @GetMapping("/{studentId}/courses")
+    public ResponseEntity<List<CourseController.CourseDto>> getCourses(@PathVariable Long studentId) {
+
+        if (!userRepository.existsById(studentId)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<CourseController.CourseDto> courses = courseEnrollmentRepository.findByStudentId(studentId)
+                .stream()
+                .map(enr -> CourseController.CourseDto.fromEntity(enr.getCourse()))
+                // dedupe by course id
+                .collect(java.util.stream.Collectors.toMap(
+                        CourseController.CourseDto::getId,
+                        dto -> dto,
+                        (a, b) -> a
+                ))
+                .values()
+                .stream()
+                .toList();
+
+        return ResponseEntity.ok(courses);
+    }
+
 
     @GetMapping("/{studentId}/progress")
-    public ResponseEntity<StudentProgressDto> getProgress(@PathVariable Long studentId) {
+    public ResponseEntity<StudentProgressDto> getProgress(@PathVariable Long studentId,
+                                                          @RequestParam(required = false) Long courseId) {
         User student = userRepository.findById(studentId).orElse(null);
         if (student == null) {
             return ResponseEntity.notFound().build();
         }
 
-        List<Assessment> assessments = assessmentRepository.findByStudent(student);
+        List<Assessment> assessments = (courseId == null)
+                ? assessmentRepository.findByStudent(student)
+                : assessmentRepository.findActiveAssessmentsByStudentAndCourse(studentId, courseId);
+
 
         int achieved = 0;
         int partially = 0;

@@ -17,6 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/api/courses")
 @RequiredArgsConstructor
@@ -116,12 +120,18 @@ public class CourseController {
 
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CourseDto {
         private Long id;
         private String name;
         private Long teacherId;
         private String teacherName;
 
+        public CourseDto(Long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
         public static CourseDto fromEntity(Course c) {
             CourseDto dto = new CourseDto();
             dto.id = c.getId();
