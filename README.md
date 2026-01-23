@@ -255,7 +255,7 @@ GitHub Project Board:
 https://github.com/users/piy678/projects/7
 
 #### Time Tracking & Sprint Reviews
-- Time estimates and actual effort were tracked per task within the project boards
+- Time was tracked per task within the project boards
 - Sprint/iteration reviews were conducted after each iteration to evaluate progress,
   review completed work items, and plan subsequent tasks
 - The backlog was continuously refined based on sprint outcomes and project progress
@@ -267,8 +267,8 @@ which were used to complement GitHub Projects for detailed backlog structuring a
 - The main product backlog and sprint backlogs were maintained using
   **Microsoft Azure DevOps Boards**
 - User stories, functional requirements, and non-functional requirements
-  were created, prioritized, and tracked through iterations
-- Each work item was assigned to team members and tracked until completion
+  were created.
+- Each work item was assigned to team members and tracked until completion through GitHub Project Plan.
 
 Azure DevOps Boards (Backlog & Sprints):  
 https://dev.azure.com/BWI-25WS-SEPR-Team06/LEOBasedAssessment/_sprints/backlog/LEOBasedAssessment%20Team/LEOBasedAssessment/Sprint%201
