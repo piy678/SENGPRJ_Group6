@@ -1,13 +1,23 @@
 # SENGPRJ_Group6
 
 # Topic: LEO based assessment
+## Overview
+
+This repository contains the backend service for the LEO-Based Assessment Tool.
+It implements RESTful APIs that support learning outcome–based assessment, user management, and progress tracking.
+
+The backend handles authentication and authorization, manages LEO graphs, courses, and assessment states, and persists all relevant data in a PostgreSQL database.
+It serves as the central logic layer between the frontend application and the database.
+
+The system is built with Spring Boot and follows standard enterprise design principles to ensure maintainability, testability, and scalability.
+
+This project is part of the Software Engineering Project course at FHTW.
+
 ### Features
 - creation of LEO structure and grade calculation for teachers
 - recording and editing of assessment results for teachers
 - visualization of current standings for learners
 - suggestion of possible next LEOs to prepare for student
-
-
 
 ## User Handbook / Guide
 This section describes how to use the application from a user perspective.
@@ -25,34 +35,19 @@ This section describes how to use the application from a user perspective.
 - Check LEO progress and current status
 - View recommendations for next LEOs
 
+End users do not interact directly with the backend application.
+All user interactions are performed via the frontend interface.
+
+Therefore, the user handbook is shared with the frontend project and
+describes the usage of the system from the perspective of teachers and students.
+
+This backend provides the underlying services and APIs required to support
+the described user workflows.
+
 ### Getting Started
 - Start the application using Docker Compose
 - Access the Electron UI
-- Default roles: Admin, Teacher, Student
-
-### Main Steps
-- [ ] Project setup: Java 17+, Maven/Gradle; modules/packages (model, service, web, test)
-- [ ] Create core classes and fields: LEO, Student, Assessment, User, Role, Status enum; dependencies
-- [ ] DB schema & migrations: tables, PK/FK, unique indexes;
-- [ ] Data access: JPA/Hibernate (or JDBC) entities/repositories to read/write LEOs, students, and assessments; mapping between DB and domain
-- [ ] Core logic (services):
-- GradingService with transactional cascade
-- AssessmentService (CRUD)  
-- RecommendationService 
-- [ ] Validation & error model: Bean Validation; global exception handler; consistent error body (code, message, optional traceId)
-- [ ] Security: login with hashed passwords (bcrypt/Argon2), RBAC (Admin/Teacher/Student), protect write endpoints
-- [ ] REST API: /leos, /students, /assessments, /recommendations with pagination/filtering/sorting; 
-- [ ]  UI (Electron): LEO table, Teacher grading view, Student progress view (progress bars/filters), basic accessibility
-- [ ]  Import/Export: JSON import for LEO catalog; CSV/JSON export of results (define formats)
-- [ ]  Logging: structured logs; basic metrics if using Spring Boot Actuator
-- [ ]  Build & run: app config (application-dev.yml), profiles (dev/test), Dockerfile + docker-compose (app + DB)
-- [ ]  Testing:
- - Unit tests
- - Integration tests 
- - API tests (REST-assured) and one E2E test 
-- [ ] Performance sanity: quick local check that key endpoints respond
-
-
+- Default roles: Teacher, Student
 
 ## Installation / Setup Guide
 The application is deployed on an AWS server and can be started using Docker.
@@ -63,18 +58,65 @@ The application is deployed on an AWS server and can be started using Docker.
 - Java 17 (for local development)
 - Git
 
+### Database Configuration
+
+The backend uses a cloud-based PostgreSQL database provided by Neon.
+
+Database credentials are **not stored in the repository**.
+They must be provided via environment variables or a `.env` file.
+
+Example variables:
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+
 ### Setup on AWS Server
 1. Clone the project repository on the AWS EC2 instance
-2. Configure environment variables (database credentials, ports)
-3. Start the application using Docker Compose
-4. The backend and frontend services are started automatically
+ ```bash
+git clone https://github.com/piy678/SENGPRJ_Group6
+cd SENGPRJ_Group6
+```
+3. Configure environment variables (database credentials, ports)
+ ```bash
+ naono .env
+```
+SPRING_DATASOURCE_URL=
+SPRING_DATASOURCE_USERNAME=
+SPRING_DATASOURCE_PASSWORD=
+
+SERVER_PORT=
+SPRING_JPA_HIBERNATE_DDL_AUTO=
+SPRING_JPA_SHOW_SQL=
+
+VITE_API=
+CORS_ALLOWED_ORIGINS=
+
+CORS_ALLOWED_ORIGINS=
+
+5. Start the application using Docker Compose
+```bash
+cd
+cd SENGPRJ_Group6_FrontendPart
+docker compose up -d
+```
+7. The backend and frontend services are started automatically
+Production URL:
+http://13.53.169.202:5174/
 
 ### Local Development (Optional)
 1. Clone the repository
 2. Start the database and backend using Docker Compose
-3. Start the Electron frontend locally
+```bash
+docker compose up -d
+```
+### Start the Application locally
 
+```bash
+mvn clean spring-boot:run
 
+```
+To run the backend locally, a `.env` file with the required environment
+variables must be provided (e.g. database credentials).
 
 ## Technical Documentation
 This section describes the technical architecture, components, and internal logic of the system.
@@ -147,33 +189,162 @@ UI: Electron
 Testing: JUnit 5, Spring Boot Test, Testcontainers (Postgres), REST-assured  
 Docker + docker-compose; Actuator für Health/Metrics  
 
+### Main Steps
+- [ ] Project setup: Java 17, Maven; package structure (controller, service, repository, model, test)
+- [ ] Domain model: LEO, Course, Student, Assessment; enums (Status/Level); relationships
+- [ ] Persistence: PostgreSQL (Neon) + JPA/Hibernate entities and repositories
+- [ ] Core services:
+  - AssessmentService (create/update/read)
+  - LeoService (calculation rules, next LEO suggestions)
+- [ ] Validation & error handling: Bean Validation + global exception handler (consistent error response)
+- [ ] Security & permissions: role-based authorization (Teacher/Student/Admin) + protected endpoints
+- [ ] REST API: endpoints for LEOs, courses, students, assessments, recommendations
+- [ ] Configuration: application properties + environment variables (.env); dev/prod profiles
+- [ ] Docker deployment: Dockerfile + docker-compose for server deployment
+- [ ] Testing:
+  - Unit tests (services)
+  - Integration tests (controllers/repositories)
+  - Security/permission tests (e.g., 403 for forbidden actions)
+- [ ] Documentation: API overview + setup guide + link to frontend repository
 
-
-## Project Management (PM)
-Project management was conducted using agile methods.
+### Project Management (PM)
+Project management was conducted using agile methods with iterative development
+(sprints/iterations) and continuous progress tracking.
 
 - A GitHub Project board was used for backlog management, task tracking, and iteration planning  
   (including requirements engineering, implementation tasks, testing, deployment, and documentation)
 - Tasks were organized into iterations and tracked with status updates
-- Responsibilities and progress were assigned to team members
-- Sprint planning and sprint reviews
-- Regular team meetings and coordination
+- Responsibilities and progress were clearly assigned to team members
 
-All project management artifacts (backlog, sprint reviews, time tracking)
-are provided as part of the Moodle submission.
+#### Task Planning & Implementation Tracking
+- **GitHub Projects** were used for detailed task planning and implementation tracking
+- Tasks were linked to concrete development activities such as backend implementation,
+  frontend development, testing, deployment, and documentation
+- Task states (e.g., To Do, In Progress, Done) were continuously updated
+
+GitHub Project Board:  
+https://github.com/users/piy678/projects/7
+
+#### Time Tracking & Sprint Reviews
+- Time estimates and actual effort were tracked per task within the project boards
+- Sprint/iteration reviews were conducted after each iteration to evaluate progress,
+  review completed work items, and plan subsequent tasks
+- The backlog was continuously refined based on sprint outcomes and project progress
 
 Additionally, backlog planning and task refinement were performed using **Microsoft Azure DevOps Boards**,
 which were used to complement GitHub Projects for detailed backlog structuring and planning.
 
+#### Backlog & Task Management
+- The main product backlog and sprint backlogs were maintained using
+  **Microsoft Azure DevOps Boards**
+- User stories, functional requirements, and non-functional requirements
+  were created, prioritized, and tracked through iterations
+- Each work item was assigned to team members and tracked until completion
 
+Azure DevOps Boards (Backlog & Sprints):  
+https://dev.azure.com/BWI-25WS-SEPR-Team06/LEOBasedAssessment/_sprints/backlog/LEOBasedAssessment%20Team/LEOBasedAssessment/Sprint%201
 
 ## Evidence for Grading Criteria
-Evidence for all grading criteria is provided and documented using multiple tools and artifacts.
+
+Evidence for all grading criteria is provided through documented project artifacts,
+repositories, and management tools. The evidence is structured according to the
+three main grading categories defined in the course.
+
+---
+
+### Solution (40%)
+
+**Functionality (30%)**
+- Fully implemented frontend and backend applications
+- Role-based access for teachers and students
+- LEO creation, assessment recording, progress visualization, and recommendations
+- Deployed and runnable system (AWS + Docker)
+
+**Quality (10%)**
+- Clean layered architecture (controller, service, repository)
+- Use of Spring Boot, JPA, and React/Electron
+- Validation, error handling, and security checks
+- Unit and integration tests
+
+Evidence:
+- Frontend repository: https://github.com/piy678/SENGPRJ_Group6_FrontendPart
+- Backend repository: https://github.com/piy678/SENGPRJ_Group6
+- Deployed system on AWS
+
+---
+### Process (40%)
+
+**Planning & Requirements Engineering**
+- User stories and functional/non-functional requirements defined and tracked
+- Backlog management using Azure DevOps Boards
+
+**Analysis, Design, Implementation & Testing**
+- Iterative development across multiple sprints
+- Continuous implementation and testing
+- Code reviews and refactoring during development
+
+**Teamwork & Project Management**
+- Task assignment and progress tracking
+- Time tracking and sprint reviews
+- Use of GitHub Projects for implementation planning
+
+**Deployment**
+- Docker-based deployment on AWS EC2
+- Environment-based configuration and cloud database (Neon)
+
+Evidence:
+- Azure DevOps Boards (backlog & sprints): https://dev.azure.com/BWI-25WS-SEPR-Team06/LEOBasedAssessment/_sprints/backlog/LEOBasedAssessment%20Team/LEOBasedAssessment/Sprint%201
+- GitHub Project board: https://github.com/users/piy678/projects/7
+- Docker and deployment documentation in repositories
+
+---
+
+### Presentation (20%)
+
+**Presentation (10%)**
+- Structured presentation of the project and system architecture
+- Live demonstration of core features
+
+**Project Reflection (10%)**
+- Written reflection covering challenges, solutions, and lessons learned
+- Evaluation of teamwork, tools, and development process
+
+Evidence:
+- Presentation slides (submitted via Moodle also on Github)
+- Written project reflection document
+
+---
+
 
 ### Source Code
-- Frontend and backend source code are maintained in GitHub in two seperated repositories
 
+- Frontend and backend source code are maintained in two **separate GitHub repositories**
+- Version control is handled via Git, with a complete commit history documenting
+  the development process
+- Commits and pull requests provide traceability of changes, bug fixes, and feature implementation
 
+Repositories:
+- Frontend: https://github.com/piy678/SENGPRJ_Group6_FrontendPart
+- Backend: https://github.com/piy678/SENGPRJ_Group6
+
+## Purpose and Background
+
+The tool supports constructive alignment, where learning outcomes (LEOs) define what students must know or be able to do, and assessments measure mastery of these outcomes instead of grading isolated tasks.
+
+Some LEOs depend on others—mastering a high-level outcome implies mastery of its supporting lower-level outcomes.
+The frontend helps visualize these hierarchical structures and mastery levels.
+
+## Requirements for Developers
+
+To work on this project, it is recommended that you have:
+
+- Basic programming skills
+
+- Interest in education technology
+
+- Fundamental web development knowledge (HTML, CSS, JavaScript/TypeScript)
+
+- Familiarity with modern frontend frameworks (React/Vite recommended)
 
 ## Reflection
 During the development of this project, we gained practical experience in designing and implementing a full-stack application with a clear separation of frontend, backend, and database layers.
@@ -192,40 +363,56 @@ Overall, the project helped us strengthen our skills in backend development with
 - Reflection, personal contribution, and personal development are documented and submitted via Moodle
 All required evidence for grading criteria has been submitted via **Moodle** as specified.
 
+## Project Management
+
+The project was developed using agile software development practices.
+
+Project management included:
+- Sprint planning and sprint reviews
+- Backlog management and task distribution
+- Time tracking and progress monitoring
+- Regular team coordination
+
+Backlogs and sprint planning were managed using project management tools
+(e.g. Azure DevOps Boards and GitHub Projects), with relevant artifacts
+submitted via Moodle.
 
 ## Personal Contribution
 
-All group members contributed actively to the project.
+All group members contributed actively to the project across multiple areas.
 
 Contributions included:
 - Frontend and backend development
-- API design and integration
+- API design and system integration
 - Testing and debugging
 - Deployment and documentation
 
-Detailed individual contributions are documented in the complete project plan and task overview are available here:  
+Individual responsibilities and contributions are documented in the project plan
+and task tracking system.
+
+Project management and contribution evidence:
 https://github.com/users/piy678/projects/7
 
-For grading purposes, the GitHub Project board serves as the primary source of
-project management evidence.
+For grading purposes, the GitHub Project board provides traceable evidence of
+task assignments, progress, and completed work per team member.
+Each task in the project board is assigned to specific team members,
+allowing individual contributions to be clearly identified.
 
 
 ## Personal Development
 
 Through this project, we developed both technical and personal skills.
 
-Technical growth included:
-- Full-stack development
-- Cloud deployment with AWS
-- Running database over a server (neon)
-- Working with distributed systems
+### Technical Development
+- Full-stack development (frontend and backend integration)
+- Cloud-based deployment using AWS
+- Use of a managed cloud PostgreSQL database (Neon)
+- Working with client–server architectures and distributed components
 
-Personal development included:
-- Team communication
-- Time management
-- Problem-solving in a collaborative environment
-
-
+### Personal Development
+- Effective team communication and collaboration
+- Time management and task prioritization
+- Problem-solving in a collaborative development environment
 
 ## Questions:
 Should the tool be web-based (browser) or desktop-based (JavaFX, Electron, etc.)?   
@@ -249,7 +436,13 @@ Mandatory. The system must generate recommendations (e.g., next applicable LEOs)
 Should grading levels (“not reached”, “partially reached”, “reached”) be customizable?  
 No. Use fixed levels, with “Unmark” as the fourth level in addition to the existing ones.   
 
+## Related Repository
 
+This backend service is consumed by the frontend application of the
+LEO-Based Assessment Tool.
+
+Frontend repository:  
+https://github.com/piy678/SENGPRJ_Group6_FrontendPart
 
 ## Contributors
 
