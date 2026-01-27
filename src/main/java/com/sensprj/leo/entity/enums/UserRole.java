@@ -31,21 +31,6 @@ public enum UserRole {
         "suggestion:dismiss:own",
         "leo:read:available_in_enrolled_courses",
         "course:read:enrolled"
-    )),
-
-    ADMIN("Administrator", List.of(
-        "user:create",
-        "user:read:all",
-        "user:update",
-        "user:delete",
-        "course:read:all",
-        "course:delete:any",
-        "leo:read:all",
-        "leo:delete:any",
-        "assessment:read:all",
-        "suggestion:read:all",
-        "audit_log:read:all",
-        "system:config"
     ));
 
     private final String displayName;
@@ -68,10 +53,6 @@ public enum UserRole {
         return permissions;
     }
 
-    public boolean canViewAuditLogs() {
-        return this == ADMIN;
-    }
-
     public boolean canCreateAssessments() {
         return this == TEACHER;
     }
@@ -81,7 +62,7 @@ public enum UserRole {
     }
 
     public boolean canViewOthersProgress() {
-        return this == TEACHER || this == ADMIN;
+        return this == TEACHER;
     }
 
     public static List<UserRole> getAllRoles() {

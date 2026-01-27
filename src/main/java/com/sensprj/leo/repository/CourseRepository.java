@@ -8,8 +8,6 @@ import java.util.List;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
-    List<Course> findByTeacherId(Long teacherId);
-    List<Course> findByIsActive(Boolean isActive);
     List<Course> findByTeacher(User teacher);
 
 }

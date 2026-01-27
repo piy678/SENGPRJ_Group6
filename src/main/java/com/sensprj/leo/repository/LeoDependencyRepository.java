@@ -21,14 +21,6 @@ public interface LeoDependencyRepository extends JpaRepository<LeoDependency, Lo
     List<LeoDependency> findByPrerequisiteLeo(Leo prerequisiteLeo);
     List<LeoDependency> findByPrerequisiteLeoId(Long prerequisiteLeoId);
 
-    List<LeoDependency> findByDependentLeoIdAndDependencyType(Long dependentLeoId, DependencyType dependencyType);
-    List<LeoDependency> findByPrerequisiteLeoIdAndDependencyType(Long prerequisiteLeoId, DependencyType dependencyType);
-
-    Optional<LeoDependency> findByDependentLeoIdAndPrerequisiteLeoId(Long dependentLeoId, Long prerequisiteLeoId);
-
-
-    boolean existsByDependentLeoAndPrerequisiteLeo(Leo dependentLeo, Leo prerequisiteLeo);
-    boolean existsByDependentLeoIdAndPrerequisiteLeoId(Long dependentLeoId, Long prerequisiteLeoId);
     long countByDependentLeoId(Long leoId);
 
 

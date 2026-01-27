@@ -9,10 +9,4 @@ import java.util.Optional;
 
 @Repository
 public interface SuggestionRepository extends JpaRepository<Suggestion, Long> {
-    List<Suggestion> findByStudentId(Long studentId);
-    List<Suggestion> findByLeoId(Long leoId);
-    Optional<Suggestion> findByStudentIdAndLeoId(Long studentId, Long leoId);
-    List<Suggestion> findByStudentIdAndIsDismissed(Long studentId, Boolean isDismissed);
-    List<Suggestion> findByStudent(User student);
-
 }
