@@ -107,7 +107,7 @@ cd SENGPRJ_Group6
 ```
 3. Configure environment variables (database credentials, ports)
  ```bash
- naono .env
+ nano .env
 ```
 SPRING_DATASOURCE_URL=
 SPRING_DATASOURCE_USERNAME=
