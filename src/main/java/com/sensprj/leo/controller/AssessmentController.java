@@ -56,24 +56,34 @@ public class AssessmentController {
         User student = userRepository.findById(studentId).orElseThrow();
         User teacher = userRepository.findById(request.getTeacherId()).orElseThrow();
 
+        List<Long> lockedLeoIds = new java.util.ArrayList<>();
+
         for (AssessmentEntry entry : request.getEntries()) {
             Leo leo = leoRepository.findById(entry.getLeoId()).orElseThrow();
+
+            if (!assessmentService.isLeoUnlockedForStudent(student, leo)) {
+                lockedLeoIds.add(leo.getId());
+                continue;
+            }
 
             LocalDateTime assessedAt = entry.getAssessedAt() != null
                     ? entry.getAssessedAt()
                     : LocalDateTime.now();
 
-            assessmentService.upsertAssessment(
-                    student,
-                    leo,
-                    teacher,
-                    entry.getStatus(),
-                    assessedAt
-            );
+            assessmentService.upsertAssessment(student, leo, teacher, entry.getStatus(), assessedAt);
+        }
+
+        if (!lockedLeoIds.isEmpty()) {
+            return ResponseEntity.status(409).body(Map.of(
+                    "message", "Some LEOs are locked (prerequisites not reached).",
+                    "lockedLeoIds", lockedLeoIds
+            ));
         }
 
         return ResponseEntity.ok().build();
     }
+
+
 
     @GetMapping("/course/{courseId}/student/{studentId}/grade")
     public ResponseEntity<?> getGrade(@PathVariable Long courseId, @PathVariable Long studentId) {
