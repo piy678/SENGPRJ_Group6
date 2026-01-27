@@ -66,7 +66,12 @@ public class ProgressController {
         }
 
         map.values().forEach(dto -> {
-            dto.progress = dto.total == 0 ? 0 : ((dto.achieved + dto.partially) * 100 / dto.total);
+            if (dto.total == 0) {
+                dto.progress = 0;
+                return;
+            }
+            double done = dto.achieved + 0.5 * dto.partially;
+            dto.progress = (int) Math.round(done * 100.0 / dto.total);
         });
 
         return new ArrayList<>(map.values());
