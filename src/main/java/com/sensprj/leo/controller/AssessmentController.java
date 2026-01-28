@@ -26,7 +26,6 @@ public class AssessmentController {
     private final LeoRepository leoRepository;
     private final UserRepository userRepository;
     private final AssessmentRepository assessmentRepository;
-    private final AssessmentArchiveRepository assessmentArchiveRepository;
     private final AssessmentService assessmentService;
 
     @GetMapping("/course/{courseId}/students")
