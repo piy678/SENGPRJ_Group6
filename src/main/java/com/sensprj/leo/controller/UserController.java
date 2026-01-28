@@ -26,13 +26,6 @@ public class UserController {
     }
 
     @Data
-    public static class CreateCourseRequest {
-        private Long teacherId;
-        private String name;
-        private List<Long> studentIds; // NEU
-    }
-
-    @Data
     public static class UserDto {
         private Long id;
         private String username;
