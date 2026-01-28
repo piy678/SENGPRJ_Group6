@@ -21,13 +21,16 @@ public class AuthController {
 
     public ResponseEntity<UserDto> login(@RequestBody LoginRequest request) {
 
-        System.out.println("Login attempt: " + request.getUsername() + " / " + request.getPassword());
+        System.out.println("Login attempt: " + request.getUsername());
 
         User user = userRepository.findByUsername(request.getUsername()).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        if (user.getPasswordHash() == null || !user.getPasswordHash().equals(request.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         return ResponseEntity.ok(UserDto.fromEntity(user));
     }
