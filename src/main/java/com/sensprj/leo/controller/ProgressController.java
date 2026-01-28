@@ -1,5 +1,7 @@
 package com.sensprj.leo.controller;
 
+
+import com.sensprj.leo.dto.StudentProgressDto;
 import com.sensprj.leo.entity.Assessment;
 import com.sensprj.leo.entity.Course;
 import com.sensprj.leo.entity.CourseEnrollment;
@@ -44,7 +46,7 @@ public class ProgressController {
             StudentProgressDto dto = map.get(a.getStudent().getId());
             if (dto == null) continue;
 
-            dto.total++;
+            dto.setTotal(dto.getTotal() + 1);
 
             AssessmentStatus status;
             try {
@@ -57,36 +59,26 @@ public class ProgressController {
             }
 
             switch (status) {
-                case REACHED -> dto.achieved++;
-                case PARTIALLY_REACHED -> dto.partially++;
-                case NOT_REACHED -> dto.notAchieved++;
-                case UNMARKED -> dto.unmarked++;
+                case REACHED -> dto.setAchieved(dto.getAchieved() + 1);
+                case PARTIALLY_REACHED -> dto.setPartially(dto.getPartially() + 1);
+                case NOT_REACHED -> dto.setNotAchieved(dto.getNotAchieved() + 1);
+                case UNMARKED -> dto.setUnmarked(dto.getUnmarked() + 1);
             }
 
         }
 
         map.values().forEach(dto -> {
-            if (dto.total == 0) {
-                dto.progress = 0;
+            if (dto.getTotal() == 0) {
+                dto.setProgress(0);
                 return;
             }
-            double done = dto.achieved + 0.5 * dto.partially;
-            double raw = done * 100.0 / dto.total;
-            dto.progress = Math.round(raw * 100.0) / 100.0;
+            double done = dto.getAchieved() + 0.5 * dto.getPartially();
+            double raw = done * 100.0 / dto.getTotal();
+            dto.setProgress(Math.round(raw * 100.0) / 100.0);
         });
 
         return new ArrayList<>(map.values());
     }
 
-    @Data
-    public static class StudentProgressDto {
-        private Long studentId;
-        private String name;
-        private int achieved;
-        private int partially;
-        private int unmarked;
-        private int notAchieved;
-        private int total;
-        private double progress;
-    }
+
 }

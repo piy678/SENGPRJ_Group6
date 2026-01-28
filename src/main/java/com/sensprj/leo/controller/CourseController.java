@@ -1,5 +1,7 @@
 package com.sensprj.leo.controller;
 
+import com.sensprj.leo.dto.CourseDto;
+import com.sensprj.leo.dto.CreateCourseRequest;
 import com.sensprj.leo.entity.Course;
 import com.sensprj.leo.entity.CourseEnrollment;
 import com.sensprj.leo.entity.User;
@@ -109,34 +111,6 @@ public class CourseController {
     }
 
 
-    // ===== DTOs =====
-
-    @Data
-    public static class CreateCourseRequest {
-        private Long teacherId;
-        private String name;
-        private List<Long> studentIds;
-    }
 
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CourseDto {
-        private Long id;
-        private String name;
-        private Long teacherId;
-        private String teacherName;
-
-        public static CourseDto fromEntity(Course c) {
-            CourseDto dto = new CourseDto();
-            dto.id = c.getId();
-            dto.name = c.getName();
-            if (c.getTeacher() != null) {
-                dto.teacherId = c.getTeacher().getId();
-                dto.teacherName = c.getTeacher().getFirstName() + " " + c.getTeacher().getLastName();
-            }
-            return dto;
-        }
-    }
 }
