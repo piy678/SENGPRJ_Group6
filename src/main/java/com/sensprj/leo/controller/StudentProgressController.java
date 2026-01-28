@@ -23,7 +23,6 @@ public class StudentProgressController {
     private final AssessmentRepository assessmentRepository;
     private final LeoDependencyRepository leoDependencyRepository;
     private final CourseEnrollmentRepository courseEnrollmentRepository;
-    private final SuggestionRepository suggestionRepository;
 
     @GetMapping("/{studentId}/courses")
     public ResponseEntity<List<CourseController.CourseDto>> getCourses(@PathVariable Long studentId) {
@@ -65,7 +64,6 @@ public class StudentProgressController {
         int achieved = 0;
         int partially = 0;
         int notAchieved = 0;
-        int unrated = 0;
         int unmarked = 0;
 
 
@@ -117,7 +115,13 @@ public class StudentProgressController {
 
         int total = achieved + partially + notAchieved + unmarked;
         int graded = achieved + partially + notAchieved;
-        int progress = total == 0 ? 0 : (int) Math.round((graded * 100.0) / total);
+        double progress;
+        if (total == 0) {
+            progress = 0.0;
+        } else {
+            double raw = (graded * 100.0) / total;
+            progress = Math.round(raw * 100.0) / 100.0;
+        }
 
 
         List<SuggestionDto> suggestionDtos = new ArrayList<>();
@@ -218,7 +222,6 @@ public class StudentProgressController {
         dto.setAchieved(achieved);
         dto.setPartially(partially);
         dto.setNotAchieved(notAchieved);
-        //dto.setUnrated(unrated);
         dto.setLeoStatuses(leoRows);
         dto.setBlocked(blockedDtos);
         dto.setSuggestions(suggestionDtos);
@@ -232,10 +235,7 @@ public class StudentProgressController {
     private AssessmentStatus parseStatus(String raw) {
         if (raw == null || raw.isBlank()) return AssessmentStatus.UNMARKED;
 
-
         String v = raw.trim().toUpperCase();
-
-
 
         try {
             return AssessmentStatus.valueOf(v);
@@ -273,8 +273,7 @@ public class StudentProgressController {
         private int partially;
         private int unmarked;
         private int notAchieved;
-        private int progress;
-        //private int unrated;
+        private double progress;
         private List<SuggestionDto> suggestions;
         private List<LeoRowDto> leoStatuses;
         private List<BlockedDto> blocked;
