@@ -13,12 +13,10 @@ import com.sensprj.leo.service.AssessmentService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.sensprj.leo.service.LeoService;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +70,6 @@ public class LeoController {
 
     @GetMapping("/course/{courseId}/dependencies")
     public List<Map<String, Long>> getDependencies(@PathVariable Long courseId) {
-        List<Object[]> rows = dependencyRepository.findEdgesByCourse(courseId);
         return dependencyRepository.findEdgesByCourse(courseId).stream().map(r -> {
             Long source = (Long) r[0];
             Long target = (Long) r[1];
@@ -102,8 +99,6 @@ public class LeoController {
         if (teacher == null) {
             return ResponseEntity.badRequest().build();
         }
-
-        leo.setCreatedBy(teacher);
 
         leo = leoRepository.save(leo);
 
