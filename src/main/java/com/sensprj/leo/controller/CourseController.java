@@ -128,10 +128,6 @@ public class CourseController {
         private Long teacherId;
         private String teacherName;
 
-        public CourseDto(Long id, String name) {
-            this.id = id;
-            this.name = name;
-        }
         public static CourseDto fromEntity(Course c) {
             CourseDto dto = new CourseDto();
             dto.id = c.getId();
