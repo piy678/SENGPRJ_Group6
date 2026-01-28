@@ -71,7 +71,8 @@ public class ProgressController {
                 return;
             }
             double done = dto.achieved + 0.5 * dto.partially;
-            dto.progress = (int) Math.round(done * 100.0 / dto.total);
+            double raw = done * 100.0 / dto.total;
+            dto.progress = Math.round(raw * 100.0) / 100.0;
         });
 
         return new ArrayList<>(map.values());
@@ -86,6 +87,6 @@ public class ProgressController {
         private int unmarked;
         private int notAchieved;
         private int total;
-        private int progress;
+        private double progress;
     }
 }
