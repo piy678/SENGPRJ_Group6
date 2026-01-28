@@ -1,5 +1,9 @@
 package com.sensprj.leo.controller;
 
+import com.sensprj.leo.dto.AssessmentEntry;
+import com.sensprj.leo.dto.LeoSimpleDto;
+import com.sensprj.leo.dto.SaveAssessmentsRequest;
+import com.sensprj.leo.dto.StudentDto;
 import com.sensprj.leo.entity.*;
 import com.sensprj.leo.entity.enums.AssessmentStatus;
 import com.sensprj.leo.repository.*;
@@ -114,42 +118,7 @@ public class AssessmentController {
 
 
 
-    // ===== DTOs =====
 
-    @Data
-    public static class StudentDto {
-        private Long id;
-        private String name;
-        public static StudentDto fromEntity(User u) {
-            StudentDto dto = new StudentDto();
-            dto.id = u.getId();
-            dto.name = u.getFirstName() + " " + u.getLastName();
-            return dto;
-        }
-    }
 
-    @Data
-    public static class LeoSimpleDto {
-        private Long id;
-        private String title;
-        public static LeoSimpleDto fromEntity(Leo leo) {
-            LeoSimpleDto dto = new LeoSimpleDto();
-            dto.id = leo.getId();
-            dto.title = leo.getName();
-            return dto;
-        }
-    }
 
-    @Data
-    public static class SaveAssessmentsRequest {
-        private Long teacherId;
-        private List<AssessmentEntry> entries;
-    }
-
-    @Data
-    public static class AssessmentEntry {
-        private Long leoId;
-        private AssessmentStatus status;
-        private LocalDateTime assessedAt;
-    }
 }

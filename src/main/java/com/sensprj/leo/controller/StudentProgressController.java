@@ -1,5 +1,6 @@
 package com.sensprj.leo.controller;
 
+import com.sensprj.leo.dto.*;
 import com.sensprj.leo.entity.*;
 import com.sensprj.leo.entity.enums.AssessmentStatus;
 import com.sensprj.leo.repository.*;
@@ -25,18 +26,18 @@ public class StudentProgressController {
     private final CourseEnrollmentRepository courseEnrollmentRepository;
 
     @GetMapping("/{studentId}/courses")
-    public ResponseEntity<List<CourseController.CourseDto>> getCourses(@PathVariable Long studentId) {
+    public ResponseEntity<List<CourseDto>> getCourses(@PathVariable Long studentId) {
 
         if (!userRepository.existsById(studentId)) {
             return ResponseEntity.notFound().build();
         }
 
-        List<CourseController.CourseDto> courses = courseEnrollmentRepository.findByStudentId(studentId)
+        List<CourseDto> courses = courseEnrollmentRepository.findByStudentId(studentId)
                 .stream()
-                .map(enr -> CourseController.CourseDto.fromEntity(enr.getCourse()))
+                .map(enr -> CourseDto.fromEntity(enr.getCourse()))
                 // dedupe by course id
                 .collect(java.util.stream.Collectors.toMap(
-                        CourseController.CourseDto::getId,
+                        CourseDto::getId,
                         dto -> dto,
                         (a, b) -> a
                 ))
@@ -262,49 +263,6 @@ public class StudentProgressController {
         };
     }
 
-    // ==== DTO-Klassen ====
-
-    @Data
-    public static class StudentProgressDto {
-        private Long studentId;
-        private String name;
-        private int totalLeos;
-        private int achieved;
-        private int partially;
-        private int unmarked;
-        private int notAchieved;
-        private double progress;
-        private List<SuggestionDto> suggestions;
-        private List<LeoRowDto> leoStatuses;
-        private List<BlockedDto> blocked;
-
-
-    }
-
-    @Data
-    public static class LeoRowDto {
-        private Long leoId;
-        private String title;
-        private String dependsOn;
-        private String status;
-        private LocalDateTime lastUpdated;
-    }
-    @Data
-    public static class SuggestionDto {
-        private String leoTitle;
-        private boolean hasDependencies;
-        private String prerequisiteTitle;
-        private LocalDateTime prerequisiteCompletedOn;
-        private String rationale;
-        private boolean ready;
-    }
-    @Data
-    public static class BlockedDto {
-        private String leoTitle;
-        private List<String> missingPrerequisites;
-        private String text;
-        private String tip;
-    }
 
 
 }

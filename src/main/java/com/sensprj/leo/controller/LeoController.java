@@ -1,5 +1,7 @@
 package com.sensprj.leo.controller;
 
+import com.sensprj.leo.dto.CreateLeoRequest;
+import com.sensprj.leo.dto.LeoDto;
 import com.sensprj.leo.entity.Course;
 import com.sensprj.leo.entity.Leo;
 import com.sensprj.leo.entity.LeoDependency;
@@ -129,7 +131,7 @@ public class LeoController {
 
     @GetMapping("/course/{courseId}/search")
     public List<LeoDto>  searchLeosForCourse(@PathVariable Long courseId,
-                                         @RequestParam(required = false) String q) {
+                                             @RequestParam(required = false) String q) {
 
         Course course = courseRepository.findById(courseId).orElseThrow();
 
@@ -145,35 +147,5 @@ public class LeoController {
         return leos.stream().map(LeoDto::fromEntity).toList();
     }
 
-
-    // ===== DTOs =====
-
-    @Data
-    public static class CreateLeoRequest {
-        private String title;
-        private String description;
-        private Long prerequisiteLeoId;
-        private Long createdById;
-    }
-
-    @Data
-    public static class LeoDto {
-        private Long id;
-        private String name;
-        private String description;
-        private String topic;
-        private Boolean isActive;
-        private Long prerequisiteCount;
-
-        public static LeoDto fromEntity(Leo leo) {
-            LeoDto dto = new LeoDto();
-            dto.id = leo.getId();
-            dto.name = leo.getName();
-            dto.description = leo.getDescription();
-            dto.topic = leo.getTopic();
-            dto.isActive = leo.getIsActive();
-            return dto;
-        }
-    }
 
 }

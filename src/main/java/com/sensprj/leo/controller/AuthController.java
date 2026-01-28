@@ -1,5 +1,7 @@
 package com.sensprj.leo.controller;
 
+import com.sensprj.leo.dto.LoginRequest;
+import com.sensprj.leo.dto.UserDto;
 import com.sensprj.leo.entity.User;
 import com.sensprj.leo.repository.UserRepository;
 import lombok.Data;
@@ -42,28 +44,5 @@ public class AuthController {
     }
 
 
-    @Data
-    public static class LoginRequest {
-        private String username;
-        private String password;
-    }
 
-    @Data
-    public static class UserDto {
-        private Long id;
-        private String username;
-        private String role;
-        private String firstName;
-        private String lastName;
-
-        public static UserDto fromEntity(User user) {
-            UserDto dto = new UserDto();
-            dto.setId(user.getId());
-            dto.setUsername(user.getUsername());
-            dto.setRole(user.getRole());
-            dto.setFirstName(user.getFirstName());
-            dto.setLastName(user.getLastName());
-            return dto;
-        }
-    }
 }
